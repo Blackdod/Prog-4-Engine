@@ -4,12 +4,15 @@
 namespace dae
 {
 	class GameObject;
+	class TextObject;
 	class Scene final
 	{
 		friend Scene& SceneManager::CreateScene(const std::string& name);
 	public:
 		void Add(std::shared_ptr<GameObject> object);
+		void Add(std::shared_ptr<TextObject> text);
 		void Remove(std::shared_ptr<GameObject> object);
+		void Remove(std::shared_ptr<TextObject> text);
 		void RemoveAll();
 
 		void Update();
@@ -26,6 +29,7 @@ namespace dae
 
 		std::string m_name;
 		std::vector < std::shared_ptr<GameObject>> m_objects{};
+		std::vector < std::shared_ptr<TextObject>> m_texts{};
 
 		static unsigned int m_idCounter; 
 	};

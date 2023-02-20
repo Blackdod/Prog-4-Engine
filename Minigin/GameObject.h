@@ -7,17 +7,17 @@ namespace dae
 	class Texture2D;
 
 	// todo: this should become final.
-	class GameObject 
+	class GameObject final
 	{
 	public:
-		virtual void Update();
-		virtual void Render() const;
+		void Update();
+		void Render() const;
 
 		void SetTexture(const std::string& filename);
 		void SetPosition(float x, float y);
 
 		GameObject() = default;
-		virtual ~GameObject();
+		~GameObject();
 		GameObject(const GameObject& other) = delete;
 		GameObject(GameObject&& other) = delete;
 		GameObject& operator=(const GameObject& other) = delete;
