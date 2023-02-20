@@ -15,5 +15,10 @@ namespace dae
 		Minigin(Minigin&& other) = delete;
 		Minigin& operator=(const Minigin& other) = delete;
 		Minigin& operator=(Minigin&& other) = delete;
+
+		float GetFixedTimeStep() const { return m_FixedTimeStep; };
+
+	private:
+		const float m_FixedTimeStep{ 0.02f };
 	};
 }

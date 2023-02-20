@@ -10,7 +10,7 @@ namespace dae
 	class GameObject final
 	{
 	public:
-		void Update();
+		void Update(float dt);
 		void Render() const;
 
 		void SetTexture(const std::string& filename);

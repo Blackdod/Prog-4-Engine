@@ -15,7 +15,7 @@ namespace dae
 		void Remove(std::shared_ptr<TextObject> text);
 		void RemoveAll();
 
-		void Update();
+		void Update(float dt);
 		void Render() const;
 
 		~Scene();
