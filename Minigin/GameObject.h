@@ -20,6 +20,7 @@ namespace dae
 		Transform* GetTransform() const;
 		TextureComponent* GetTexture() const;
 		TextComponent* GetText() const;
+		FPSComponent* GetFPSComponent() const;
 		bool IsComponentPresent(dae::Component::ComponentType type) const;
 
 		void SetPosition(float x = 0.f, float y = 0.f, float z = 0.f);

@@ -14,7 +14,20 @@ dae::GameObject::~GameObject()
 
 void dae::GameObject::Update([[maybe_unused]] float dt)
 {
+	FPSComponent* pFPS = GetFPSComponent();
 	TextComponent* pText = GetText();
+
+	if (pFPS != nullptr)
+	{
+		pFPS->Update(dt);
+
+		if (pText != nullptr)
+		{
+			std::string printString = std::to_string(pFPS->GetNrOfFrames()) + " FPS";
+			pText->SetText(printString);
+		}
+	}
+
 	if (pText != nullptr)
 	{
 		pText->Update();
@@ -111,6 +124,21 @@ dae::TextComponent* dae::GameObject::GetText() const
 
 	return static_cast<TextComponent*>(*result);
 }
+
+dae::FPSComponent* dae::GameObject::GetFPSComponent() const
+{
+	auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+		return (i->GetType() == Component::ComponentType::FPS);
+		});
+
+	if (result == m_pComponents.end())
+	{
+		return nullptr; //early out if no such component
+	}
+
+	return static_cast<FPSComponent*>(*result);
+}
+
 
 bool dae::GameObject::IsComponentPresent(dae::Component::ComponentType type) const
 {

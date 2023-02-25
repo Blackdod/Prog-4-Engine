@@ -17,7 +17,8 @@ namespace dae
 			none,
 			transform,
 			texture,
-			text
+			text,
+			FPS
 		};
 		ComponentType m_type{ ComponentType::none };
 
@@ -69,6 +70,7 @@ namespace dae
 
 		void SetText(const std::string& text);
 		void SetPosition(float x, float y);
+		//void SetColor(Uint8 r, Uint8 g, Uint8 b);
 
 		TextComponent(const std::string& text, std::shared_ptr<Font> font);
 		~TextComponent() = default;
@@ -77,10 +79,26 @@ namespace dae
 		TextComponent& operator=(const TextComponent& other) = delete;
 		TextComponent& operator=(TextComponent&& other) = delete;
 	private:
-		bool m_needsUpdate;
+		bool m_needsUpdate; //Only update at initialize or if text changes
 		std::string m_text;
 		Transform m_transform{};
 		std::shared_ptr<Font> m_font;
 		std::shared_ptr<Texture2D> m_textTexture;
+		//SDL_Color m_color;
+	};
+
+	class FPSComponent final : public Component
+	{
+	public:
+		FPSComponent() : m_NrOfFrames{ 0 }
+		{
+			Component::m_type = ComponentType::FPS;
+		};
+
+		void Update(float deltaT);
+		int GetNrOfFrames() const { return m_NrOfFrames; };
+
+	private:
+		int m_NrOfFrames;
 	};
 }

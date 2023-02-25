@@ -38,7 +38,7 @@ void dae::TextComponent::Update()
 {
 	if (m_needsUpdate)
 	{
-		const SDL_Color color = { 255,255,255 }; // only white text is supported now
+		const SDL_Color color{ 255,255,255 };
 		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), color);
 		if (surf == nullptr)
 		{
@@ -76,4 +76,16 @@ void dae::TextComponent::SetPosition(const float x, const float y)
 	m_transform.SetPosition(x, y, 0.0f);
 }
 
+//void dae::TextComponent::SetColor(Uint8 r, Uint8 g, Uint8 b)
+//{
+//	m_color.r = r;
+//	m_color.g = g;
+//	m_color.b = b;
+//}
+
 #pragma endregion
+
+void dae::FPSComponent::Update(float deltaT)
+{
+	m_NrOfFrames = static_cast<int>(1.f / deltaT);
+}

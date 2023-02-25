@@ -12,6 +12,8 @@
 
 #include <chrono>
 
+#include <iostream>
+
 SDL_Window* g_window{};
 
 void PrintSDLVersion()
@@ -97,10 +99,11 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		lastTime = currentTime;
 		lag += deltaT;
 		doContinue = input.ProcessInput();
-		sceneManager.Update(deltaT);
+		//std::cout << deltaT << '\n';
 		while (lag >= m_FixedTimeStep)
 		{
 			//Fixed update
+			sceneManager.Update(lag);	
 			lag -= m_FixedTimeStep;
 		}
 		renderer.Render();
