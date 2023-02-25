@@ -16,22 +16,24 @@ void dae::GameObject::Update([[maybe_unused]] float dt) {}
 
 void dae::GameObject::Render() const
 {
+	TextureComponent* pTexture = GetTexture();
 	if (IsComponentPresent(dae::Component::ComponentType::transform) == true)
 	{
 		Transform* pTransform = GetTransform();
 		const auto& pos = pTransform->GetPosition();
 
-		if (m_texture != nullptr)
+
+		if (pTexture != nullptr)
 		{
-			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+			Renderer::GetInstance().RenderTexture(*pTexture->GetTexturePtr(), pos.x, pos.y);
 		}
 	}
 	else
 	{
 		const glm::vec3& pos{ 0,0,0 };
-		if (m_texture != nullptr)
+		if (pTexture != nullptr)
 		{
-			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+			Renderer::GetInstance().RenderTexture(*pTexture->GetTexturePtr(), pos.x, pos.y);
 		}
 	}
 	
@@ -70,6 +72,20 @@ dae::Transform* dae::GameObject::GetTransform() const
 	return static_cast<Transform*>(*result);
 }
 
+dae::TextureComponent* dae::GameObject::GetTexture() const
+{
+	auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+		return (i->GetType() == Component::ComponentType::texture);
+		});
+
+	if (result == m_pComponents.end())
+	{
+		return nullptr; //early out if no such component
+	}
+
+	return static_cast<TextureComponent*>(*result);
+}
+
 bool dae::GameObject::IsComponentPresent(dae::Component::ComponentType type) const
 {
 	bool isFound{ false };
@@ -105,5 +121,9 @@ void dae::GameObject::SetPosition(float x, float y, float z)
 
 void dae::GameObject::SetTexture(const std::string& filename)
 {
-	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+	TextureComponent* pTexture = GetTexture();
+	if (pTexture != nullptr)
+	{
+		pTexture->SetTexture(filename);
+	}
 }

@@ -18,6 +18,7 @@ namespace dae
 		void AddComponent(Component* component);
 		Component* GetComponent() const;
 		Transform* GetTransform() const;
+		TextureComponent* GetTexture() const;
 		bool IsComponentPresent(dae::Component::ComponentType type) const;
 
 		void SetPosition(float x = 0.f, float y = 0.f, float z = 0.f);
@@ -34,8 +35,5 @@ namespace dae
 
 	private:
 		std::vector<Component*> m_pComponents{};
-	
-		// todo: mmm, every gameobject has a texture? Is that correct?
-		std::shared_ptr<Texture2D> m_texture{nullptr};
 	};
 }

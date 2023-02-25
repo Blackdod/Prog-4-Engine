@@ -1,5 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <memory>
+#include <string>
+#include "Texture2D.h"
+
 
 namespace dae
 {
@@ -9,7 +13,8 @@ namespace dae
 		enum class ComponentType
 		{
 			none,
-			transform
+			transform,
+			texture
 		};
 		ComponentType m_type{ ComponentType::none };
 
@@ -25,7 +30,7 @@ namespace dae
 	private:
 	};
 
-	class Transform : public Component
+	class Transform final : public Component
 	{
 	public:
 		Transform(float x = 0.f, float y = 0.f, float z = 0.f) : m_position{ x, y, z }
@@ -37,5 +42,19 @@ namespace dae
 		void SetPosition(float x, float y, float z);
 	private:
 		glm::vec3 m_position;
+	};
+
+	class TextureComponent final : public Component
+	{
+	public:
+		TextureComponent() 
+		{
+			Component::m_type = ComponentType::texture;
+		};
+
+		void SetTexture(const std::string& filename);
+		std::shared_ptr<Texture2D> GetTexturePtr() const { return m_texture; };
+	private:
+		std::shared_ptr<Texture2D> m_texture{ nullptr };
 	};
 }
