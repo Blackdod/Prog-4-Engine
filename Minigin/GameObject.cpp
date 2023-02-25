@@ -12,7 +12,14 @@ dae::GameObject::~GameObject()
 	}
 };
 
-void dae::GameObject::Update([[maybe_unused]] float dt) {}
+void dae::GameObject::Update([[maybe_unused]] float dt)
+{
+	TextComponent* pText = GetText();
+	if (pText != nullptr)
+	{
+		pText->Update();
+	}
+}
 
 void dae::GameObject::Render() const
 {
@@ -37,6 +44,11 @@ void dae::GameObject::Render() const
 		}
 	}
 	
+	TextComponent* pText = GetText();
+	if (pText != nullptr)
+	{
+		pText->Render();
+	}
 }
 
 void dae::GameObject::AddComponent(Component* component)
@@ -86,6 +98,20 @@ dae::TextureComponent* dae::GameObject::GetTexture() const
 	return static_cast<TextureComponent*>(*result);
 }
 
+dae::TextComponent* dae::GameObject::GetText() const
+{
+	auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+		return (i->GetType() == Component::ComponentType::text);
+		});
+
+	if (result == m_pComponents.end())
+	{
+		return nullptr; //early out if no such component
+	}
+
+	return static_cast<TextComponent*>(*result);
+}
+
 bool dae::GameObject::IsComponentPresent(dae::Component::ComponentType type) const
 {
 	bool isFound{ false };
@@ -109,13 +135,18 @@ bool dae::GameObject::IsComponentPresent(dae::Component::ComponentType type) con
 
 void dae::GameObject::SetPosition(float x, float y, float z)
 {
-	auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
-		return (i->GetType() == Component::ComponentType::transform);
-		});
+	Transform* pTransform = GetTransform();
 
-	if (result != m_pComponents.end())
+	if (pTransform != nullptr)
 	{
-		static_cast<Transform*>(*result)->SetPosition(x,y,z);
+		pTransform->SetPosition(x,y,z);
+	}
+
+	TextComponent* pText = GetText();
+
+	if (pText != nullptr)
+	{
+		pText->SetPosition(x, y);
 	}
 }
 
