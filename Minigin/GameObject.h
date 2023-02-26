@@ -16,15 +16,15 @@ namespace dae
 		void Render() const;
 
 		void AddComponent(Component* component);
+		void RemoveComponent(Component::ComponentType type);
 		Component* GetComponent() const;
 		Transform* GetTransform() const;
 		TextureComponent* GetTexture() const;
 		TextComponent* GetText() const;
 		FPSComponent* GetFPSComponent() const;
-		bool IsComponentPresent(dae::Component::ComponentType type) const;
+		bool IsComponentPresent(Component::ComponentType type) const;
 
-		void SetPosition(float x = 0.f, float y = 0.f, float z = 0.f);
-		void SetTexture(const std::string& filename);
+		void SetPosition(float x = 0.f, float y = 0.f, float z = 0.f); //Set position of all components that could have it
 
 
 		GameObject() = default;

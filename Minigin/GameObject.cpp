@@ -69,6 +69,88 @@ void dae::GameObject::AddComponent(Component* component)
 	m_pComponents.push_back(component);
 }
 
+void dae::GameObject::RemoveComponent(Component::ComponentType type)
+{
+	switch (type)
+	{
+	case dae::Component::ComponentType::none:
+	{
+		//Couldn't use get since i wanted the iterator
+		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+			return (i->GetType() == Component::ComponentType::none);
+			});
+		
+		if (result != m_pComponents.end())
+		{
+			m_pComponents.erase(result);
+			delete *result;
+			*result = nullptr;
+		}
+		break;
+	}
+	case dae::Component::ComponentType::transform:
+	{
+		//Couldn't use get since i wanted the iterator
+		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+			return (i->GetType() == Component::ComponentType::transform);
+			});
+
+		if (result != m_pComponents.end())
+		{
+			m_pComponents.erase(result);
+			delete* result;
+			*result = nullptr;
+		}
+		break;
+	}
+	case dae::Component::ComponentType::texture:
+	{
+		//Couldn't use get since i wanted the iterator
+		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+			return (i->GetType() == Component::ComponentType::texture);
+			});
+
+		if (result != m_pComponents.end())
+		{
+			m_pComponents.erase(result);
+			delete* result;
+			*result = nullptr;
+		}
+		break;
+	}
+	case dae::Component::ComponentType::text:
+	{
+		//Couldn't use get since i wanted the iterator
+		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+			return (i->GetType() == Component::ComponentType::text);
+			});
+
+		if (result != m_pComponents.end())
+		{
+			m_pComponents.erase(result);
+			delete* result;
+			*result = nullptr;
+		}
+		break;
+	}
+	case dae::Component::ComponentType::FPS:
+	{
+		//Couldn't use get since i wanted the iterator
+		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
+			return (i->GetType() == Component::ComponentType::FPS);
+			});
+
+		if (result != m_pComponents.end())
+		{
+			m_pComponents.erase(result);
+			delete* result;
+			*result = nullptr;
+		}
+		break;
+	}
+	}
+}
+
 dae::Component* dae::GameObject::GetComponent() const
 {
 		auto result = std::find_if(m_pComponents.begin(), m_pComponents.end(), [](const Component* i) {
@@ -175,14 +257,5 @@ void dae::GameObject::SetPosition(float x, float y, float z)
 	if (pText != nullptr)
 	{
 		pText->SetPosition(x, y);
-	}
-}
-
-void dae::GameObject::SetTexture(const std::string& filename)
-{
-	TextureComponent* pTexture = GetTexture();
-	if (pTexture != nullptr)
-	{
-		pTexture->SetTexture(filename);
 	}
 }
