@@ -87,5 +87,5 @@ void dae::TextComponent::SetPosition(const float x, const float y)
 
 void dae::FPSComponent::Update(float deltaT)
 {
-	m_NrOfFrames = static_cast<int>(1.f / deltaT);
+	m_NrOfFrames = static_cast<int>(1 / deltaT);
 }

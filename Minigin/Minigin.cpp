@@ -103,9 +103,15 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		while (lag >= m_FixedTimeStep)
 		{
 			//Fixed update
-			sceneManager.Update(lag);	
+			sceneManager.FixedUpdate(m_FixedTimeStep); 
 			lag -= m_FixedTimeStep;
 		}
+		sceneManager.Update(deltaT);	
 		renderer.Render();
+
+		const auto sleepTime = currentTime
+																+ std::chrono::milliseconds(m_FrameTimeMs)
+																- std::chrono::high_resolution_clock::now();
+		std::this_thread::sleep_for(sleepTime);
 	}
 }

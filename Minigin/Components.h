@@ -99,6 +99,6 @@ namespace dae
 		int GetNrOfFrames() const { return m_NrOfFrames; };
 
 	private:
-		int m_NrOfFrames;
+		int m_NrOfFrames{};
 	};
 }

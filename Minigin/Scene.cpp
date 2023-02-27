@@ -34,6 +34,14 @@ void Scene::Update([[maybe_unused]] float dt)
 	}
 }
 
+void Scene::FixedUpdate([[maybe_unused]] float dt)
+{
+	for (auto& object : m_objects)
+	{
+		object->FixedUpdate(dt);
+	}
+}
+
 void Scene::Render() const
 {
 	for (const auto& object : m_objects)

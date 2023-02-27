@@ -12,7 +12,7 @@ dae::GameObject::~GameObject()
 	}
 };
 
-void dae::GameObject::Update([[maybe_unused]] float dt)
+void dae::GameObject::Update([[maybe_unused]] float dt) const
 {
 	FPSComponent* pFPS = GetFPSComponent();
 	TextComponent* pText = GetText();
@@ -23,7 +23,7 @@ void dae::GameObject::Update([[maybe_unused]] float dt)
 
 		if (pText != nullptr)
 		{
-			std::string printString = std::to_string(pFPS->GetNrOfFrames()) + " FPS";
+			const std::string printString = std::to_string(pFPS->GetNrOfFrames()) + " FPS";
 			pText->SetText(printString);
 		}
 	}
@@ -34,12 +34,17 @@ void dae::GameObject::Update([[maybe_unused]] float dt)
 	}
 }
 
+void dae::GameObject::FixedUpdate([[maybe_unused]] float dt) const
+{
+	
+}
+
 void dae::GameObject::Render() const
 {
-	TextureComponent* pTexture = GetTexture();
+	const TextureComponent* pTexture = GetTexture();
 	if (IsComponentPresent(dae::Component::ComponentType::transform) == true)
 	{
-		Transform* pTransform = GetTransform();
+		const Transform* pTransform = GetTransform();
 		const auto& pos = pTransform->GetPosition();
 
 
@@ -57,7 +62,7 @@ void dae::GameObject::Render() const
 		}
 	}
 	
-	TextComponent* pText = GetText();
+	const TextComponent* pText = GetText();
 	if (pText != nullptr)
 	{
 		pText->Render();

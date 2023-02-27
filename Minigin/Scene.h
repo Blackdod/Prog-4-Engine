@@ -16,6 +16,7 @@ namespace dae
 		void RemoveAll();
 
 		void Update(float dt);
+		void FixedUpdate(float dt);
 		void Render() const;
 
 		~Scene();

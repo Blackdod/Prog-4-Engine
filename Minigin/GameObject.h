@@ -12,7 +12,8 @@ namespace dae
 	class GameObject final
 	{
 	public:
-		void Update(float dt);
+		void Update(float dt) const;
+		void FixedUpdate(float dt) const;
 		void Render() const;
 
 		void AddComponent(Component* component);

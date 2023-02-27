@@ -9,6 +9,14 @@ void dae::SceneManager::Update([[maybe_unused]] float dt)
 	}
 }
 
+void dae::SceneManager::FixedUpdate([[maybe_unused]] float dt)
+{
+	for (auto& scene : m_scenes)
+	{
+		scene->FixedUpdate(dt);
+	}
+}
+
 void dae::SceneManager::Render()
 {
 	for (const auto& scene : m_scenes)

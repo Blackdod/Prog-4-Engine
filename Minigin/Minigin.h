@@ -19,6 +19,8 @@ namespace dae
 		float GetFixedTimeStep() const { return m_FixedTimeStep; };
 
 	private:
-		const float m_FixedTimeStep{ 0.0166f }; //60fps
+		const float m_FixedTimeStep{ 0.02f };
+		const int m_DesiredFPS{ 60 };
+		const int m_FrameTimeMs{ 1000 / m_DesiredFPS };
 	};
 }
