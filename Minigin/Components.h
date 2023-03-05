@@ -92,4 +92,23 @@ namespace dae
 		int m_NrOfFrames{0};
 		TextComponent* m_pOwnerText{ nullptr };
 	};
+
+	class Encircle final : public Component
+	{
+	public:
+		Encircle(GameObject* pOwner, float distance = 0.f, float secPerRotation = 1.f, bool clockwise = true)
+		:Component(pOwner)
+		,m_Distance(distance)
+		,m_SecPerRotation(secPerRotation)
+		,m_isRotatingClockwise(clockwise)
+		{};
+
+		void Update(float deltaT) override;
+	private:
+		glm::vec3 m_Offset{};
+		float m_Distance{};
+		float m_SecPerRotation{};
+		float m_Time{};
+		bool m_isRotatingClockwise{};
+	};
 }

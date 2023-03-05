@@ -8,18 +8,14 @@ dae::GameObject::~GameObject()
 void dae::GameObject::Update(float dt)
 {
 	UpdateWorldPosition();
-	for(auto& component :m_pComponents)
+	for(const auto& component :m_pComponents)
 	{
 		component->Update(dt);
 		component->SetPosition(m_worldPos.x, m_worldPos.y, m_worldPos.z);
 	}
 
-	for(auto& child : m_pChildren)
+	for(const auto& child : m_pChildren)
 	{
-		if(m_positionIsDirty)
-		{
-			child->SetPositionDirty();
-		}
 		child->Update(dt);
 	}
 }
@@ -36,7 +32,7 @@ void dae::GameObject::Render() const
 		component->Render();
 	}
 
-	for (auto& child : m_pChildren)
+	for (const auto& child : m_pChildren)
 	{
 		child->Render();
 	}
@@ -72,6 +68,16 @@ void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
 	m_localPos = pos;
 	SetPositionDirty();
 }
+
+void dae::GameObject::SetPositionDirty()
+{
+	m_positionIsDirty = true;
+	for(const auto& child : m_pChildren)
+	{
+		child->SetPositionDirty();
+	}
+}
+
 
 const glm::vec3& dae::GameObject::GetWorldPosition()
 {

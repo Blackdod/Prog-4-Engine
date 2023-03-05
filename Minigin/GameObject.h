@@ -76,7 +76,7 @@ namespace dae
 
 		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
 		void SetLocalPosition(const glm::vec3& pos);
-		void SetPositionDirty() { m_positionIsDirty = true; };
+		void SetPositionDirty();
 		const glm::vec3& GetLocalPosition() const { return m_localPos; };
 		const glm::vec3& GetWorldPosition();
 		void UpdateWorldPosition();
