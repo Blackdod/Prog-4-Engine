@@ -5,6 +5,7 @@
 #include "Renderer.h"
 #include "Texture2D.h"
 #include "Font.h"
+#include "GameObject.h"
 
 #pragma region Transform
 
@@ -17,24 +18,52 @@ void dae::Transform::SetPosition(const float x, const float y, const float z)
 
 #pragma endregion
 
-#pragma region Texture
+#pragma region Render
 
-void dae::TextureComponent::SetTexture(const std::string& filename)
+void dae::RenderComponent::Update([[maybe_unused]] float deltaT)
+{
+	if (m_pOwnerTransform == nullptr) //Check if the transform pointer is set
+	{
+		m_pOwnerTransform = GetOwner()->GetComponent<Transform>(); //This will only happen the first time
+	}
+	//or every update if there's no transform, this need optimization but don't know how
+}
+
+void dae::RenderComponent::Render() const
+{
+	if (m_pOwnerTransform == nullptr) //Check if the transform pointer is set
+	{
+		Renderer::GetInstance().RenderTexture(*m_texture, 0.f, 0.f);
+	}
+	else
+	{
+		const auto& pos = m_pOwnerTransform->GetPosition();
+		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+	}
+}
+
+void dae::RenderComponent::SetTexture(const std::string& filename)
 {
 	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
 }
 
+void dae::RenderComponent::SetTexture(const std::shared_ptr<Texture2D>& texture)
+{
+	m_texture = texture;
+}
 #pragma endregion
 
 #pragma region Text
 
-dae::TextComponent::TextComponent(const std::string& text, std::shared_ptr<Font> font)
-	: m_needsUpdate(true), m_text(text), m_font(std::move(font)), m_textTexture(nullptr)
+dae::TextComponent::TextComponent(GameObject* pOwner, const std::string& text, std::shared_ptr<Font> font)
+	:Component(pOwner)
+	,m_needsUpdate(true)
+	,m_text(text)
+	,m_font(std::move(font))
 {
-	Component::m_type = ComponentType::text;
 }
 
-void dae::TextComponent::Update()
+void dae::TextComponent::Update([[maybe_unused]] float deltaT)
 {
 	if (m_needsUpdate)
 	{
@@ -50,17 +79,8 @@ void dae::TextComponent::Update()
 			throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
 		}
 		SDL_FreeSurface(surf);
-		m_textTexture = std::make_shared<Texture2D>(texture);
+		GetOwner()->GetComponent<RenderComponent>()->SetTexture(std::make_shared<Texture2D>(texture));
 		m_needsUpdate = false;
-	}
-}
-
-void dae::TextComponent::Render() const
-{
-	if (m_textTexture != nullptr)
-	{
-		const auto& pos = m_transform.GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
 	}
 }
 
@@ -69,11 +89,6 @@ void dae::TextComponent::SetText(const std::string& text)
 {
 	m_text = text;
 	m_needsUpdate = true;
-}
-
-void dae::TextComponent::SetPosition(const float x, const float y)
-{
-	m_transform.SetPosition(x, y, 0.0f);
 }
 
 //void dae::TextComponent::SetColor(Uint8 r, Uint8 g, Uint8 b)
@@ -85,7 +100,20 @@ void dae::TextComponent::SetPosition(const float x, const float y)
 
 #pragma endregion
 
+#pragma region FPS
+
 void dae::FPSComponent::Update(float deltaT)
 {
-	m_NrOfFrames = static_cast<int>(1 / deltaT);
+	if(m_pOwnerText == nullptr) //Check if the text pointer is set
+	{
+		m_pOwnerText = GetOwner()->GetComponent<TextComponent>(); //This will only happen the first time
+	}
+	else
+	{
+		m_NrOfFrames = static_cast<int>(1 / deltaT);
+		const std::string printString = std::to_string(m_NrOfFrames) + " FPS";
+		m_pOwnerText->SetText(printString);
+	}
 }
+
+#pragma endregion

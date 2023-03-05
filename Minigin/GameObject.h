@@ -8,7 +8,6 @@ namespace dae
 {
 	class Texture2D;
 
-	// todo: this should become final.
 	class GameObject final
 	{
 	public:
@@ -16,17 +15,52 @@ namespace dae
 		void FixedUpdate(float dt) const;
 		void Render() const;
 
-		void AddComponent(Component* component);
-		void RemoveComponent(Component::ComponentType type);
-		Component* GetComponent() const;
-		Transform* GetTransform() const;
-		TextureComponent* GetTexture() const;
-		TextComponent* GetText() const;
-		FPSComponent* GetFPSComponent() const;
-		bool IsComponentPresent(Component::ComponentType type) const;
+		template <typename T, typename... Args>
+		T& AddComponent(Args&&... args)
+		{
+			m_pComponents.emplace_back(std::make_shared<T>(this, std::forward<Args>(args)...));
+			return *static_cast<T*>(m_pComponents.back().get());
+		}
+		template <typename T>
+		void RemoveComponent()
+		{
+			for (auto it{ m_pComponents.begin() }; it != m_pComponents.end(); ++it)
+			{
+				if (dynamic_cast<T*>(it->get()))
+				{
+					m_pComponents.erase(it);
+					break;
+				}
+			}
+		}
 
-		void SetPosition(float x = 0.f, float y = 0.f, float z = 0.f); //Set position of all components that could have it
+		template <typename T>
+		T* GetComponent() const
+		{
+			for (auto& component : m_pComponents)
+			{
+				T* CompPtr = dynamic_cast<T*>(component.get());
+				if (CompPtr)
+				{
+					return CompPtr;
+				}
+			}
+			return nullptr;
+		}
 
+		template <typename T>
+		bool IsComponentPresent() const
+		{
+			for (auto& component : m_pComponents)
+			{
+				T* CompPtr = dynamic_cast<T*>(component.get());
+				if (CompPtr)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 
 		GameObject() = default;
 		~GameObject();
@@ -37,6 +71,6 @@ namespace dae
 
 
 	private:
-		std::vector<Component*> m_pComponents{};
+		std::vector<std::shared_ptr<Component>> m_pComponents{};
 	};
 }
