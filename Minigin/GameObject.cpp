@@ -3,11 +3,6 @@
 
 dae::GameObject::~GameObject()
 {
-	for(auto& child : m_pChildren)
-	{
-		delete child;
-		child = nullptr;
-	}
 };
 
 void dae::GameObject::Update(float dt)
@@ -49,7 +44,6 @@ void dae::GameObject::Render() const
 
 void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
 {
-	
 	if (pParent == nullptr)
 	{
 		SetLocalPosition(GetWorldPosition());
