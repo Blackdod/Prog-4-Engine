@@ -11,7 +11,14 @@ namespace dae
 	class GameObject final
 	{
 	public:
-		void Update(float dt) const;
+		GameObject() = default;
+		~GameObject();
+		GameObject(const GameObject& other) = delete;
+		GameObject(GameObject&& other) = delete;
+		GameObject& operator=(const GameObject& other) = delete;
+		GameObject& operator=(GameObject&& other) = delete;
+
+		void Update(float dt);
 		void FixedUpdate(float dt) const;
 		void Render() const;
 
@@ -19,6 +26,11 @@ namespace dae
 		T& AddComponent(Args&&... args)
 		{
 			m_pComponents.emplace_back(std::make_shared<T>(this, std::forward<Args>(args)...));
+
+			if(typeid(T) == typeid(Transform))
+			{
+				m_localPos = dynamic_cast<Transform*>(m_pComponents.back().get())->GetPosition();
+			}
 			return *static_cast<T*>(m_pComponents.back().get());
 		}
 		template <typename T>
@@ -49,7 +61,7 @@ namespace dae
 		}
 
 		template <typename T>
-		bool IsComponentPresent() const
+		bool IsComponentPresent() const //Barely/Not used, just have it just in case I need it
 		{
 			for (auto& component : m_pComponents)
 			{
@@ -62,15 +74,22 @@ namespace dae
 			return false;
 		}
 
-		GameObject() = default;
-		~GameObject();
-		GameObject(const GameObject& other) = delete;
-		GameObject(GameObject&& other) = delete;
-		GameObject& operator=(const GameObject& other) = delete;
-		GameObject& operator=(GameObject&& other) = delete;
-
+		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
+		void SetLocalPosition(const glm::vec3& pos);
+		void SetPositionDirty() { m_positionIsDirty = true; };
+		const glm::vec3& GetLocalPosition() const { return m_localPos; };
+		const glm::vec3& GetWorldPosition();
+		void UpdateWorldPosition();
 
 	private:
 		std::vector<std::shared_ptr<Component>> m_pComponents{};
+		glm::vec3 m_localPos{};
+		glm::vec3 m_worldPos{};
+		bool m_positionIsDirty{ false };
+		GameObject* m_pParent{ nullptr };
+		std::vector<GameObject*> m_pChildren{};
+
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
 	};
 }

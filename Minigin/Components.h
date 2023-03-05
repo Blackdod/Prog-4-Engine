@@ -23,6 +23,7 @@ namespace dae
 
 		virtual void Update([[maybe_unused]] float deltaT) {};
 		virtual void Render() const {};
+		virtual void SetPosition([[maybe_unused]] float x,[[maybe_unused]] float y,[[maybe_unused]] float z) {};
 	protected:
 		explicit Component(GameObject* pOwner) : m_pOwner(pOwner) {};
 		GameObject* GetOwner() const { return m_pOwner; };
