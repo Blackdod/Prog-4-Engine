@@ -31,14 +31,16 @@ void dae::RenderComponent::Update([[maybe_unused]] float deltaT)
 
 void dae::RenderComponent::Render() const
 {
+	const float textureWidthOffset = m_texture->GetSize().x / 2.f;
+	const float textureHeightOffset = m_texture->GetSize().y / 2.f;
 	if (m_pOwnerTransform == nullptr) //Check if the transform pointer is set
 	{
-		Renderer::GetInstance().RenderTexture(*m_texture, 0.f, 0.f);
+		Renderer::GetInstance().RenderTexture(*m_texture, -textureWidthOffset, -textureHeightOffset);
 	}
 	else
 	{
 		const auto& pos = m_pOwnerTransform->GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+		Renderer::GetInstance().RenderTexture(*m_texture, pos.x - textureWidthOffset, pos.y - textureHeightOffset);
 	}
 }
 
