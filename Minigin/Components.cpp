@@ -130,9 +130,14 @@ void dae::Encircle::Update(float deltaT)
 		multiplier = -1;
 	}
 
-	m_Time += deltaT; 
-	m_Offset.x =  m_Distance * cos(multiplier * ( static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
-	m_Offset.y =  m_Distance * sin(multiplier * (static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
+	m_Time += deltaT;
+	if(m_Time >= m_SecPerRotation)
+	{
+		m_Time -= m_SecPerRotation;
+	}
+
+	m_Offset.x =  m_Distance * cosf(multiplier * ( static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
+	m_Offset.y =  m_Distance * sinf(multiplier * (static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
 	
 	GetOwner()->SetLocalPosition(glm::vec3(m_Offset.x, m_Offset.y, 0.f));
 	GetOwner()->SetPositionDirty();

@@ -14,10 +14,12 @@ void dae::GameObject::Update(float dt)
 		component->SetPosition(m_worldPos.x, m_worldPos.y, m_worldPos.z);
 	}
 
-	for(const auto& child : m_pChildren)
-	{
-		child->Update(dt);
-	}
+	//for(const auto& child : m_pChildren)
+	//{
+	//	child->Update(dt);
+	//}
+
+	//ALL OBJECTS GET UPDATED IN THE SCENE
 }
 
 void dae::GameObject::FixedUpdate([[maybe_unused]] float dt) const

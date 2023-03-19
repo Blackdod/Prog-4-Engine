@@ -81,13 +81,15 @@ namespace dae
 		const glm::vec3& GetWorldPosition();
 		void UpdateWorldPosition();
 
+		const std::vector<GameObject*>& GetChildren() const { return m_pChildren; };
+
 	private:
 		std::vector<std::shared_ptr<Component>> m_pComponents{};
 		glm::vec3 m_localPos{};
 		glm::vec3 m_worldPos{};
 		bool m_positionIsDirty{ false };
 		GameObject* m_pParent{ nullptr };
-		std::vector<GameObject*> m_pChildren{};
+		std::vector<GameObject*> m_pChildren{}; //Change to shared
 
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
