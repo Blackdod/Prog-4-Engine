@@ -171,7 +171,6 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPat
       <AdditionalIncludeDirectories>$(SolutionDir)\3rdParty\imgui-1.89.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
