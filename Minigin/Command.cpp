@@ -1,13 +1,15 @@
 #include "Command.h"
 
-dae::MoveCommand::MoveCommand(std::shared_ptr<GameObject> object, float speed, glm::f32vec2 dir)
+using namespace dae;
+
+MoveCommand::MoveCommand(std::shared_ptr<GameObject> object, float speed, glm::f32vec2 dir)
 	:m_pObj(object)
 	,m_Speed(speed)
 	,m_Dir(dir)
 {
 }
 
-void dae::MoveCommand::Execute(float deltaTime)
+void MoveCommand::Execute(float deltaTime)
 {
 	glm::vec2 currentPos{ m_pObj.lock()->GetWorldPosition().x, m_pObj.lock()->GetWorldPosition().y };
 
@@ -18,7 +20,7 @@ void dae::MoveCommand::Execute(float deltaTime)
 	m_pObj.lock()->SetPositionDirty();
 }
 
-void dae::MoveCommand::Undo(float deltaTime)
+void MoveCommand::Undo(float deltaTime)
 {
 	const auto objTransform{ m_pObj.lock()->GetComponent<Transform>() };
 	glm::vec2 currentPos{ objTransform->GetPosition().x, objTransform->GetPosition().y };

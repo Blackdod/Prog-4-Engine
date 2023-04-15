@@ -19,12 +19,12 @@ namespace dae
 		{
 			XINPUT_STATE state;
 			ZeroMemory(&state, sizeof(XINPUT_STATE));
-
+		
 			dwResult = XInputGetState(i, &state);
-
+		
 			if (dwResult == ERROR_SUCCESS)
 			{
-				m_pControllers.push_back(std::make_unique<XBox360Controller>(i));
+				m_pGamePads.push_back(std::make_unique<XBox360Controller>(static_cast<unsigned int>(i)));
 			}
 			else
 			{
@@ -36,6 +36,16 @@ namespace dae
 	bool InputManager::ProcessInput(float deltaTime)
 	{
 		SDL_Event e;
+		const Uint8* keyState = SDL_GetKeyboardState(NULL);
+
+		for (auto commandsIterator = m_KeyboardCommands.begin(); commandsIterator != m_KeyboardCommands.end(); ++commandsIterator)
+		{
+			if(keyState[commandsIterator->first])
+			{
+				commandsIterator->second->Execute(deltaTime);
+			}
+		}
+
 		while (SDL_PollEvent(&e))
 		{
 			if (e.type == SDL_QUIT)
@@ -43,10 +53,20 @@ namespace dae
 				return false;
 			}
 
+			if(e.type == SDL_KEYDOWN)
+			{
+				
+			}
+
+			if (e.type == SDL_KEYUP)
+			{
+
+			}
+
 			ImGui_ImplSDL2_ProcessEvent(&e);
 		}
 
-		for (const auto& controller : m_pControllers)
+		for (const auto& controller : m_pGamePads)
 		{
 			controller->Update();
 
@@ -82,7 +102,7 @@ namespace dae
 				}
 			}
 
-			if (controller->IsDown(XBox360Controller::ControllerButton::LeftShoulder))
+			if (controller->IsDown(ControllerButton::LeftShoulder))
 			{
 				return false;
 			}
@@ -91,8 +111,14 @@ namespace dae
 		return true;
 	}
 
-	void InputManager::AssignButtonToCommand(unsigned int controllerIdx, XBox360Controller::ControllerButton button, Command* command, InputType inputType)
+	void InputManager::AssignButtonToCommand(unsigned int controllerIdx, ControllerButton button, std::unique_ptr<Command>&& command, InputType inputType)
 	{
-		m_Commands[std::make_pair(controllerIdx, button)] = std::make_pair(std::unique_ptr<Command>(command), inputType);
+		m_Commands[std::make_pair(controllerIdx, button)] = std::make_pair(std::move(command), inputType);
 	}
+
+	void InputManager::AssignButtonToCommand(SDL_Scancode button, std::unique_ptr<Command>&& command)
+	{
+		m_KeyboardCommands[button] = std::move(command);
+	}
+	
 }

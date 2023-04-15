@@ -15,14 +15,14 @@ namespace dae
 	class MoveCommand final : public Command
 	{
 	public:
-		MoveCommand(std::shared_ptr<GameObject> object, float speed, glm::f32vec2 dir);
+		MoveCommand(std::shared_ptr<GameObject> object, float speed, glm::vec2 dir);
 
 		void Execute(float deltaTime) override;
 		void Undo(float deltaTime) override;
 	private:
 		std::weak_ptr<GameObject> m_pObj;
 		float m_Speed;
-		glm::f32vec2 m_Dir;
+		glm::vec2 m_Dir;
 	};
 }
 

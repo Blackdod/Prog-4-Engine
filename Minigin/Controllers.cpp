@@ -3,7 +3,7 @@
 #include <XInput.h>
 #pragma comment (lib, "xinput.lib")
 
-#include "XBox360Controller.h"
+#include "Controllers.h"
 
 using namespace dae;
 
@@ -44,7 +44,7 @@ public:
 
 	bool IsDownThisFrame(unsigned int button) const { return buttonsPressedThisFrame & button; }
 	bool IsUpThisFrame(unsigned int button) const { return buttonsReleasedThisFrame & button; }
-	bool IsBeingPressed(unsigned int button) const {  return currentState.Gamepad.wButtons & button; }
+	bool IsBeingPressed(unsigned int button) const { return currentState.Gamepad.wButtons & button; }
 };
 
 XBox360Controller::XBox360Controller(unsigned int controllerIdx)
@@ -77,3 +77,4 @@ bool XBox360Controller::IsBeingPressed(ControllerButton button) const
 {
 	return pImpl->IsBeingPressed(static_cast<unsigned int>(button));
 }
+

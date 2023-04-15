@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <map>
-#include "XBox360Controller.h"
+#include "Controllers.h"
 #include "Singleton.h"
 #include "Command.h"
 
@@ -18,18 +18,22 @@ namespace dae
 	{
 	public:
 		InputManager();
+		~InputManager() = default;
 		bool ProcessInput(float deltaTime);
 
 		void AssignButtonToCommand(	unsigned int controllerIdx,
-									XBox360Controller::ControllerButton button,
-									Command* command,
+									ControllerButton button,
+									std::unique_ptr<Command>&& command,
 									InputType inputType);
-	private:
-		XBox360Controller* m_pXboxController = nullptr;
-		InputType m_InputType = InputType::up;
-		std::vector<std::unique_ptr<XBox360Controller>> m_pControllers{};
 
-		std::map<std::pair<unsigned, XBox360Controller::ControllerButton>, std::pair<std::unique_ptr<Command>, InputType>> m_Commands;
+		void AssignButtonToCommand(SDL_Scancode button,
+									std::unique_ptr<Command>&& command);
+
+	private:
+		std::vector<std::unique_ptr<XBox360Controller>> m_pGamePads{};
+
+		std::map<std::pair<unsigned, ControllerButton>, std::pair<std::unique_ptr<Command>, InputType>> m_Commands;
+		std::map< SDL_Scancode, std::unique_ptr<Command>> m_KeyboardCommands;
 	};
 
 }
