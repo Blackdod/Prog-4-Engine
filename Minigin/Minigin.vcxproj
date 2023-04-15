@@ -192,6 +192,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPat
     <ClInclude Include="..\3rdParty\imgui-1.89.4\imstb_rectpack.h" />
     <ClInclude Include="..\3rdParty\imgui-1.89.4\imstb_textedit.h" />
     <ClInclude Include="..\3rdParty\imgui-1.89.4\imstb_truetype.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameObject.h" />
@@ -205,6 +206,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPat
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="XBox360Controller.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\3rdParty\imgui-1.89.4\backends\imgui_impl_opengl2.cpp" />
@@ -215,6 +217,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPat
     <ClCompile Include="..\3rdParty\imgui-1.89.4\imgui_plot.cpp" />
     <ClCompile Include="..\3rdParty\imgui-1.89.4\imgui_tables.cpp" />
     <ClCompile Include="..\3rdParty\imgui-1.89.4\imgui_widgets.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Components.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -228,6 +231,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPat
     <ClCompile Include="TextObject.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="XBox360Controller.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

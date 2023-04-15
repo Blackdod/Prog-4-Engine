@@ -98,7 +98,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		const float deltaT = std::chrono::duration<float>(currentTime - lastTime).count();
 		lastTime = currentTime;
 		lag += deltaT;
-		doContinue = input.ProcessInput();
+		doContinue = input.ProcessInput(deltaT);
 		//std::cout << deltaT << '\n';
 		while (lag >= m_FixedTimeStep)
 		{

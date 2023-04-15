@@ -34,10 +34,23 @@ void dae::GameObject::Render() const
 		component->Render();
 	}
 
-	for (const auto& child : m_pChildren)
+	//for (const auto& child : m_pChildren)
+	//{
+	//	child->Render();
+	//}
+}
+
+void dae::GameObject::RenderUI() const
+{
+	for (const auto& component : m_pComponents)
 	{
-		child->Render();
+		component->RenderUI();
 	}
+
+	//for (const auto& child : m_pChildren)
+	//{
+	//	child->RenderUI();
+	//}
 }
 
 void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)

@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
-
+#include "imgui_plot.h"
 
 namespace dae
 {
@@ -23,6 +23,7 @@ namespace dae
 
 		virtual void Update([[maybe_unused]] float deltaT) {};
 		virtual void Render() const {};
+		virtual void RenderUI() const {};
 		virtual void SetPosition([[maybe_unused]] float x,[[maybe_unused]] float y,[[maybe_unused]] float z) {};
 	protected:
 		explicit Component(GameObject* pOwner) : m_pOwner(pOwner) {};
@@ -110,5 +111,51 @@ namespace dae
 		float m_SecPerRotation{};
 		float m_Time{};
 		bool m_isRotatingClockwise{};
+	};
+
+	class ImGUIComponenent final : public Component
+	{
+	public:
+		ImGUIComponenent(GameObject* pOwner/* ,SDL_Window* window*/)
+			:Component(pOwner)
+			//,m_window(window)
+		{};
+
+		void RenderUI() const override;
+	private:
+		struct TransformStruct
+		{
+			float matrix[16] =
+			{
+				1,0,0,0,
+				0,1,0,0,
+				0,0,1,0,
+				0,0,0,1
+			};
+		};
+
+		class GameObject3D
+		{
+		public:
+			TransformStruct transform;
+			int ID{1};
+		};
+
+		class GameObject3DAlt
+		{
+		public:
+			TransformStruct* transform;
+			int ID{1};
+		};
+		//SDL_Window* m_window;
+
+		std::unique_ptr<ImGui::PlotConfig> m_pIntPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
+		void TrashTheCacheInts(ImGui::PlotConfig& plotConfig, int samples) const;
+
+		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectPlotConfig{ std::make_unique<ImGui::PlotConfig>()  };
+		void TrashTheCacheGameObjects(ImGui::PlotConfig& plotConfig, int samples) const;
+
+		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectAltPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
+		void TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const;
 	};
 }

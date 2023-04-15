@@ -84,6 +84,12 @@
     <ClInclude Include="..\3rdParty\imgui-1.89.4\imgui_plot.h">
       <Filter>Imgui</Filter>
     </ClInclude>
+    <ClInclude Include="XBox360Controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -148,6 +154,12 @@
     </ClCompile>
     <ClCompile Include="..\3rdParty\imgui-1.89.4\imgui_plot.cpp">
       <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="XBox360Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

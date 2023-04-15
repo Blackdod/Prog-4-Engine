@@ -21,6 +21,7 @@ namespace dae
 		void Update(float dt);
 		void FixedUpdate(float dt) const;
 		void Render() const;
+		void RenderUI() const;
 
 		template <typename T, typename... Args>
 		T& AddComponent(Args&&... args)

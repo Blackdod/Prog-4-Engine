@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "GameObject.h"
-#include "TextObject.h"
 
 using namespace dae;
 
@@ -55,3 +54,10 @@ void Scene::Render() const
 	}
 }
 
+void Scene::RenderUI() const
+{
+	for (const auto& object : m_objects)
+	{
+		object->RenderUI();
+	}
+}
