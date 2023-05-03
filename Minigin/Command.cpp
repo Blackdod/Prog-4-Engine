@@ -1,4 +1,5 @@
 #include "Command.h"
+#include "Components.h"
 
 using namespace dae;
 
@@ -29,4 +30,20 @@ void MoveCommand::Undo(float deltaTime)
 	currentPos.x -= m_Speed * m_Dir.x * deltaTime;
 	currentPos.y -= m_Speed * m_Dir.y * deltaTime;
 	objTransform->SetPosition(currentPos.x, currentPos.y, objTransform->GetPosition().z);
+}
+
+dae::KillCommand::KillCommand(std::shared_ptr<GameObject> object)
+	:m_pObj(object)
+{
+}
+
+void dae::KillCommand::Execute([[maybe_unused]] float deltaTime)
+{
+	int idx = m_pObj.lock()->GetComponent<PlayerComponent>()->GetIndex();
+	m_pObj.lock()->GetComponent<LifeComponent>()->m_pSubject->Notify(*m_pObj.lock(), Event::PlayerDied, idx);
+}
+
+void dae::KillCommand::Undo([[maybe_unused]] float deltaTime)
+{
+	//No add live function atm
 }

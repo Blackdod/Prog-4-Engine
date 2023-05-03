@@ -1,12 +1,16 @@
 #pragma once
+#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include "Components.h"
+
+//#include "Components.h"
 //#include "Transform.h"
 
 namespace dae
 {
 	class Texture2D;
+	class Component;
+	class Transform;
 
 	class GameObject final
 	{
@@ -28,10 +32,10 @@ namespace dae
 		{
 			m_pComponents.emplace_back(std::make_shared<T>(this, std::forward<Args>(args)...));
 
-			if(typeid(T) == typeid(Transform))
-			{
-				m_localPos = dynamic_cast<Transform*>(m_pComponents.back().get())->GetPosition();
-			}
+			//if(typeid(T) == typeid(Transform))
+			//{
+			//	m_localPos = dynamic_cast<Transform*>(m_pComponents.back().get())->GetPosition();
+			//}
 			return *static_cast<T*>(m_pComponents.back().get());
 		}
 		template <typename T>
@@ -77,8 +81,10 @@ namespace dae
 
 		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
 		void SetLocalPosition(const glm::vec3& pos);
+		void SetStartPosition(const glm::vec3& pos);
 		void SetPositionDirty();
-		const glm::vec3& GetLocalPosition() const { return m_localPos; };
+		const glm::vec3& GetLocalPosition() const;
+		const glm::vec3& GetStartPosition() const;
 		const glm::vec3& GetWorldPosition();
 		void UpdateWorldPosition();
 
@@ -88,11 +94,14 @@ namespace dae
 		std::vector<std::shared_ptr<Component>> m_pComponents{};
 		glm::vec3 m_localPos{};
 		glm::vec3 m_worldPos{};
+		glm::vec3 m_startWorldPos{};
 		bool m_positionIsDirty{ false };
 		GameObject* m_pParent{ nullptr };
 		std::vector<GameObject*> m_pChildren{}; //Change to shared
 
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
+
+		void Respawn();
 	};
 }

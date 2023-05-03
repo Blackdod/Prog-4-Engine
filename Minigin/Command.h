@@ -24,5 +24,16 @@ namespace dae
 		float m_Speed;
 		glm::vec2 m_Dir;
 	};
+
+	class KillCommand final : public Command
+	{
+	public:
+		KillCommand(std::shared_ptr<GameObject> object);
+
+		void Execute([[maybe_unused]] float deltaTime) override;
+		void Undo([[maybe_unused]] float deltaTime) override;
+	private:
+		std::weak_ptr<GameObject> m_pObj;
+	};
 }
 

@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "Texture2D.h"
 #include "Font.h"
-#include "GameObject.h"
+//#include "GameObject.h"
 
 #include <chrono>
 #include <numeric>
@@ -17,6 +17,11 @@ void dae::Transform::SetPosition(const float x, const float y, const float z)
 	m_position.x = x;
 	m_position.y = y;
 	m_position.z = z;
+}
+
+void dae::Transform::SetPosition(glm::vec3 position)
+{
+	m_position = position;
 }
 
 #pragma endregion
@@ -402,6 +407,54 @@ void dae::ImGUIComponenent::TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotC
 
 	chungus->clear();
 	delete chungus;
+}
+
+#pragma endregion
+
+#pragma region Lives
+
+void dae::LifeComponent::OnNotify(const GameObject& gameObject, Event eventType, int optionalValue)
+{
+	gameObject;//do nothing
+	HandleEvents(eventType, optionalValue);
+}
+
+void dae::LifeComponent::HandleEvents(Event eventType, int optionalValue)
+{
+	const int idx = GetOwner()->GetComponent<PlayerComponent>()->GetIndex();
+
+	switch (eventType)
+	{
+	case Event::PlayerDied:
+		if(idx != optionalValue)
+		{
+			break;
+		}
+		Die();
+		break;
+	default:
+		break;
+	}
+}
+
+void dae::LifeComponent::Die()
+{
+	--m_lives;
+	m_pSubject->Notify(*GetOwner(), Event::UpdateLives, GetOwner()->GetComponent<PlayerComponent>()->GetIndex());
+
+	if(m_lives > 0)
+	{
+		Respawn();
+	}
+	else
+	{
+		m_pSubject->Notify(*GetOwner(), Event::GameOver);
+	}
+}
+
+void dae::LifeComponent::Respawn()
+{
+	GetOwner()->SetLocalPosition(GetOwner()->GetStartPosition());
 }
 
 #pragma endregion

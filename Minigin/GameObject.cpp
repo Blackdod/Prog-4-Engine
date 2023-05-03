@@ -1,5 +1,5 @@
 #include "GameObject.h"
-#include "ResourceManager.h"
+#include "Components.h"
 
 dae::GameObject::~GameObject()
 {
@@ -84,6 +84,11 @@ void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
 	SetPositionDirty();
 }
 
+void dae::GameObject::SetStartPosition(const glm::vec3& pos)
+{
+	m_startWorldPos = pos;
+}
+
 void dae::GameObject::SetPositionDirty()
 {
 	m_positionIsDirty = true;
@@ -91,6 +96,16 @@ void dae::GameObject::SetPositionDirty()
 	{
 		child->SetPositionDirty();
 	}
+}
+
+const glm::vec3& dae::GameObject::GetLocalPosition() const
+{
+	return GetComponent<Transform>()->GetPosition();
+}
+
+const glm::vec3& dae::GameObject::GetStartPosition() const
+{
+	return m_startWorldPos;
 }
 
 
@@ -127,4 +142,8 @@ void dae::GameObject::RemoveChild(GameObject* child)
 	{
 		m_pChildren.erase(childToDelete);	
 	}
+}
+
+void dae::GameObject::Respawn()
+{
 }

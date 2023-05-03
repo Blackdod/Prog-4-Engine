@@ -2,13 +2,18 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+
+#include "GameObject.h"
 #include "imgui_plot.h"
+
+#include "Observer.h"
+#include "Subject.h"
 
 namespace dae
 {
 	class Texture2D;
 	class Font;
-	class GameObject;
+	//class GameObject;
 
 	class Component
 	{
@@ -21,10 +26,13 @@ namespace dae
 		Component& operator=(const Component& other) = delete;
 		Component& operator=(Component&& other) = delete;
 
+
+		virtual void BeginPlay() {};
 		virtual void Update([[maybe_unused]] float deltaT) {};
 		virtual void Render() const {};
 		virtual void RenderUI() const {};
 		virtual void SetPosition([[maybe_unused]] float x,[[maybe_unused]] float y,[[maybe_unused]] float z) {};
+		virtual void SetPosition([[maybe_unused]] glm::vec3 pos) {};
 	protected:
 		explicit Component(GameObject* pOwner) : m_pOwner(pOwner) {};
 		GameObject* GetOwner() const { return m_pOwner; };
@@ -38,12 +46,18 @@ namespace dae
 		Transform(GameObject* pOwner, float x = 0.f, float y = 0.f, float z = 0.f)
 		:Component(pOwner)
 		,m_position{ x, y, z }
-		{};
+		,m_startPosition{ x, y, z }
+		{
+			
+		}
 
 		const glm::vec3& GetPosition() const { return m_position; }
+		const glm::vec3& GetStartPosition() const { return m_startPosition; }
 		void SetPosition(float x, float y, float z);
+		void SetPosition(glm::vec3 position);
 	private:
 		glm::vec3 m_position;
+		glm::vec3 m_startPosition;
 	};
 
 	class RenderComponent final : public Component
@@ -144,7 +158,7 @@ namespace dae
 		class GameObject3DAlt
 		{
 		public:
-			TransformStruct* transform;
+			TransformStruct* transform{};
 			int ID{1};
 		};
 		//SDL_Window* m_window;
@@ -157,5 +171,46 @@ namespace dae
 
 		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectAltPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
 		void TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const;
+	};
+
+	class LifeComponent final : public Component, public Observer
+	{
+	public:
+		LifeComponent(GameObject* pOwner, const std::shared_ptr<Subject>& subject, int lives = 3)
+			:Component(pOwner)
+			,m_pSubject(subject)
+			,m_lives(lives)
+		{
+			m_pOwnerTransform = pOwner->GetComponent<Transform>();
+			subject->AddObserver(this);
+		}
+
+		int GetLives() const { return m_lives; }
+		void Die();
+
+		void OnNotify(const GameObject& gameObject, Event eventType, int optionalValue = 0) override;
+
+		std::shared_ptr<Subject> m_pSubject{};
+		
+	private:
+		void HandleEvents(Event eventType, int optionalValue = 0);
+		void Respawn();
+
+		int m_lives;
+		Transform* m_pOwnerTransform;
+	};
+
+	class PlayerComponent final : public Component
+	{
+	public:
+		PlayerComponent(GameObject* pOwner, int idx)
+			:Component(pOwner)
+			, m_Idx(idx)
+		{
+		}
+
+		int GetIndex() const { return m_Idx; }
+	private:
+		int m_Idx;
 	};
 }
