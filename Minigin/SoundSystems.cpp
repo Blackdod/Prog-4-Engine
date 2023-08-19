@@ -10,8 +10,6 @@ void NullSoundSystem::PlaySound(int)
 }
 
 SDLSoundSystem::SDLSoundSystem()
-	:m_SoundList{}
-	, m_EventQueue{}
 {
 	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, MIX_CHANNELS);
 
@@ -24,24 +22,25 @@ SDLSoundSystem::~SDLSoundSystem()
 	m_Quit = true;
 	m_ConditionVariable.notify_one();
 
-	for (auto& sound : m_SoundList) {
+	for (auto& sound : m_SoundList)
+	{
 		Mix_FreeChunk(sound.second);
 		sound.second = nullptr;
 	}
 
 	Mix_CloseAudio();
 	Mix_Quit();
-
 }
 
 
 void SDLSoundSystem::Update()
 {
-	while (!m_Quit) {
-
+	while (!m_Quit)
+	{
 		std::unique_lock<std::mutex> lock(m_Mutex);
 		m_ConditionVariable.wait(lock, [this]() { return !m_EventQueue.empty() || m_Quit; });
-		if (m_Quit) {
+		if (m_Quit)
+		{
 			break;
 		}
 
@@ -49,9 +48,11 @@ void SDLSoundSystem::Update()
 		m_EventQueue.pop();
 
 
-		switch (event.type) {
+		switch (event.type)
+		{
 		case SoundType::Sound:
-			if (m_SoundList.count(event.soundId)) {
+			if (m_SoundList.count(event.soundId))
+			{
 				auto chunk = m_SoundList[event.soundId];
 				Mix_PlayChannel(-1, chunk, 0);
 				m_SoundsToPlay.push_back(chunk);
@@ -73,9 +74,11 @@ void SDLSoundSystem::PlaySound(int soundId)
 
 void SDLSoundSystem::AddSound(const std::string& filename)
 {
+	//Make sure the sound only gets pushed once (and not on multiple threads)
 	std::lock_guard<std::mutex> lock(m_Mutex);
 	Mix_Chunk* sound = Mix_LoadWAV(filename.c_str());
-	if (sound != nullptr) {
+	if (sound != nullptr)
+	{
 		int soundId = static_cast<int>(m_SoundList.size());
 		m_SoundList[soundId] = sound;
 	}

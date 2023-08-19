@@ -1,9 +1,7 @@
 #pragma once
 #include <queue>
-#include <memory>
 #include <thread>
 #include <condition_variable>
-#include <map>
 #include <SDL_mixer.h>
 #include <unordered_map>
 
@@ -42,7 +40,6 @@ public:
 
 class SDLSoundSystem final : public SoundSystem
 {
-
 public:
 	SDLSoundSystem();
 	~SDLSoundSystem() override;
@@ -59,7 +56,6 @@ private:
 	enum class SoundType {
 		Sound,
 		Music
-
 	};
 
 	struct Event {
@@ -67,14 +63,12 @@ private:
 		int soundId;
 	};
 
-	std::unordered_map<int, Mix_Chunk*> m_SoundList;
+	std::unordered_map<int, Mix_Chunk*> m_SoundList{};
 	std::vector<Mix_Chunk*> m_SoundsToPlay;
 	std::mutex m_Mutex;
 	std::condition_variable m_ConditionVariable;
-	std::queue<Event> m_EventQueue;
+	std::queue<Event> m_EventQueue{};
 	bool m_Quit = false;
 	std::jthread m_Thread;
-	int m_Volume;
-
-
+	int m_Volume{ 10 };
 };
