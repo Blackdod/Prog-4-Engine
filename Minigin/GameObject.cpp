@@ -89,6 +89,13 @@ void dae::GameObject::SetStartPosition(const glm::vec3& pos)
 	m_startWorldPos = pos;
 }
 
+void dae::GameObject::SetStartPosition(float x, float y)
+{
+	m_startWorldPos.x = x;
+	m_startWorldPos.y = y;
+	m_startWorldPos.z = 0;
+}
+
 void dae::GameObject::SetPositionDirty()
 {
 	m_positionIsDirty = true;

@@ -151,7 +151,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameCommands.cpp" />
+    <ClCompile Include="GameComponents.cpp" />
     <ClCompile Include="Pacman.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Events.h" />
+    <ClInclude Include="GameCommands.h" />
+    <ClInclude Include="GameComponents.h" />
+    <ClInclude Include="HelperStructs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

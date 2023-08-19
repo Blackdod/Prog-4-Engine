@@ -4,7 +4,7 @@
 #include <string>
 
 #include "GameObject.h"
-#include "imgui_plot.h"
+//#include "imgui_plot.h"
 
 #include "Observer.h"
 #include "Subject.h"
@@ -33,9 +33,10 @@ namespace dae
 		virtual void RenderUI() const {};
 		virtual void SetPosition([[maybe_unused]] float x,[[maybe_unused]] float y,[[maybe_unused]] float z) {};
 		virtual void SetPosition([[maybe_unused]] glm::vec3 pos) {};
+
+		const GameObject* GetOwner() const { return m_pOwner; };
 	protected:
 		explicit Component(GameObject* pOwner) : m_pOwner(pOwner) {};
-		GameObject* GetOwner() const { return m_pOwner; };
 	private:
 		GameObject* m_pOwner{nullptr};
 	};
@@ -127,49 +128,71 @@ namespace dae
 		bool m_isRotatingClockwise{};
 	};
 
-	class ImGUIComponenent final : public Component
+	//class ImGUIComponenent final : public Component
+	//{
+	//public:
+	//	ImGUIComponenent(GameObject* pOwner/* ,SDL_Window* window*/)
+	//		:Component(pOwner)
+	//		//,m_window(window)
+	//	{};
+	//
+	//	void RenderUI() const override;
+	//private:
+	//	struct TransformStruct
+	//	{
+	//		float matrix[16] =
+	//		{
+	//			1,0,0,0,
+	//			0,1,0,0,
+	//			0,0,1,0,
+	//			0,0,0,1
+	//		};
+	//	};
+	//
+	//	class GameObject3D
+	//	{
+	//	public:
+	//		TransformStruct transform;
+	//		int ID{1};
+	//	};
+	//
+	//	class GameObject3DAlt
+	//	{
+	//	public:
+	//		TransformStruct* transform{};
+	//		int ID{1};
+	//	};
+	//	//SDL_Window* m_window;
+	//
+	//	std::unique_ptr<ImGui::PlotConfig> m_pIntPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
+	//	void TrashTheCacheInts(ImGui::PlotConfig& plotConfig, int samples) const;
+	//
+	//	std::unique_ptr<ImGui::PlotConfig> m_pGameObjectPlotConfig{ std::make_unique<ImGui::PlotConfig>()  };
+	//	void TrashTheCacheGameObjects(ImGui::PlotConfig& plotConfig, int samples) const;
+	//
+	//	std::unique_ptr<ImGui::PlotConfig> m_pGameObjectAltPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
+	//	void TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const;
+	//};
+
+	class ColliderComponent : public Component
 	{
 	public:
-		ImGUIComponenent(GameObject* pOwner/* ,SDL_Window* window*/)
-			:Component(pOwner)
-			//,m_window(window)
-		{};
-
-		void RenderUI() const override;
+		struct Collider
+		{
+			float xMin, yMin, width, height;
+		};
+	
+		ColliderComponent(GameObject* go, std::string tag);
+	
+		bool IsColliding(ColliderComponent* otherCollider) const;
+		void Update([[maybe_unused]] float deltaT) override;
+		void SetDimensions(float width, float height);
+		void SetPosition(float xPos, float yPos);
+		Collider GetColliderBox() { return m_ColliderBox; }
+		std::string GetTag() { return m_Tag; };
+	
 	private:
-		struct TransformStruct
-		{
-			float matrix[16] =
-			{
-				1,0,0,0,
-				0,1,0,0,
-				0,0,1,0,
-				0,0,0,1
-			};
-		};
-
-		class GameObject3D
-		{
-		public:
-			TransformStruct transform;
-			int ID{1};
-		};
-
-		class GameObject3DAlt
-		{
-		public:
-			TransformStruct* transform{};
-			int ID{1};
-		};
-		//SDL_Window* m_window;
-
-		std::unique_ptr<ImGui::PlotConfig> m_pIntPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
-		void TrashTheCacheInts(ImGui::PlotConfig& plotConfig, int samples) const;
-
-		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectPlotConfig{ std::make_unique<ImGui::PlotConfig>()  };
-		void TrashTheCacheGameObjects(ImGui::PlotConfig& plotConfig, int samples) const;
-
-		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectAltPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
-		void TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const;
+		Collider m_ColliderBox{};
+		std::string m_Tag{ "ALL" };
 	};
 }

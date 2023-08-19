@@ -6,6 +6,7 @@
 #include "Texture2D.h"
 #include "Font.h"
 //#include "GameObject.h"
+#include "CollisionManager.h"
 
 #include <chrono>
 #include <numeric>
@@ -155,258 +156,317 @@ void dae::Encircle::Update(float deltaT)
 
 #pragma region ImGUI
 
-void dae::ImGUIComponenent::RenderUI() const
+//void dae::ImGUIComponenent::RenderUI() const
+//{
+//	//GUI here
+//	//Static because stuff didn't work as member variable
+//	static int nrOfSamples{ 10 };
+//	static bool showIntGraph{ false };
+//	ImGui::PlotConfig intPlotConfig{};
+//
+//	ImGui::Begin("Exercise 2"); //Create a window called "Exercise 2"
+//	ImGui::InputInt("samples", &nrOfSamples);
+//	if (ImGui::Button("Trash the Cache") && !showIntGraph)
+//	{
+//		showIntGraph = true;
+//		TrashTheCacheInts(intPlotConfig, nrOfSamples);
+//		*m_pIntPlotConfig = ImGui::PlotConfig{ intPlotConfig };
+//	}
+//
+//	if (showIntGraph)
+//	{
+//		ImGui::Plot("Trash the Cache Ints", *m_pIntPlotConfig);
+//	}
+//	ImGui::End();
+//
+//	static bool showGameObjectGraph{ false };
+//	ImGui::PlotConfig gameObjectPlotConfig{};
+//	ImGui::PlotConfig gameObjectAltPlotConfig{};
+//
+//	ImGui::Begin("Exercise 3"); //Create a window called "Exercise 3"
+//	ImGui::InputInt("samples", &nrOfSamples);
+//	if (ImGui::Button("Trash the Cache") && !showGameObjectGraph)
+//	{
+//		showGameObjectGraph = true;
+//		TrashTheCacheGameObjects(gameObjectPlotConfig, nrOfSamples);
+//		*m_pGameObjectPlotConfig = ImGui::PlotConfig{ gameObjectPlotConfig };
+//
+//		TrashTheCacheGameObjectAlts(gameObjectAltPlotConfig, nrOfSamples);
+//		*m_pGameObjectAltPlotConfig = ImGui::PlotConfig{ gameObjectAltPlotConfig };
+//	}
+//
+//	if (showGameObjectGraph)
+//	{
+//		ImGui::Plot("Trash the Cache GameObjects", *m_pGameObjectPlotConfig);
+//		ImGui::Plot("Trash the Cache GameObjectAlts", *m_pGameObjectAltPlotConfig);
+//	}
+//
+//	ImGui::End();
+//}
+//
+//void dae::ImGUIComponenent::TrashTheCacheInts(ImGui::PlotConfig& plotConfig, int samples) const
+//{
+//	const size_t size = 10'000'000;
+//	auto chungus = new std::vector<int>(size, 1);
+//
+//	delete plotConfig.values.ys;
+//
+//	std::vector<float> averages{};
+//	std::vector<float> xData{};
+//
+//	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+//	{
+//		std::vector<long long> durations{};
+//		for (int j{}; j < samples; ++j)
+//		{
+//			auto start = std::chrono::high_resolution_clock::now();
+//
+//			for (int i{}; i < size; i += stepsize)
+//			{
+//				chungus->at(i) *= 2;
+//			}
+//
+//			auto end = std::chrono::high_resolution_clock::now();
+//			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+//			durations.push_back(deltaT);
+//		}
+//		durations.erase(std::max_element(durations.begin(), durations.end()));
+//		durations.erase(std::min_element(durations.begin(), durations.end()));
+//
+//		long long longSize{ long long(durations.size()) };
+//
+//		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
+//		averages.push_back(average);
+//
+//		xData.push_back((float)stepsize);
+//		durations.clear();
+//	}
+//	const int dataBufferSize{ (int)averages.size() };
+//	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
+//	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataX[i] = xData[i];
+//	}
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataY[i] = averages[i];
+//	}
+//
+//	plotConfig.values.xs = pDataX.get(); // this line is optional
+//	plotConfig.values.ys = pDataY.get();
+//	plotConfig.values.count = dataBufferSize;
+//	plotConfig.scale.min = 0;
+//	plotConfig.scale.max = pDataY[0];
+//	plotConfig.tooltip.show = true;
+//	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
+//	plotConfig.grid_x.show = true;
+//	plotConfig.grid_y.show = true;
+//	plotConfig.frame_size = ImVec2(200, 200);
+//	plotConfig.line_thickness = 2.f;
+//	plotConfig.values.color = ImColor{ 200, 150, 0 };
+//
+//	chungus->clear();
+//	delete chungus;
+//}
+//
+//void dae::ImGUIComponenent::TrashTheCacheGameObjects(ImGui::PlotConfig& plotConfig, int samples) const
+//{
+//	const size_t size = 10'000'000;
+//	auto chungus = new std::vector<GameObject3D>(size);
+//
+//	delete plotConfig.values.ys;
+//
+//	std::vector<float> averages{};
+//	std::vector<float> xData{};
+//
+//	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+//	{
+//		std::vector<long long> durations{};
+//		for (int j{}; j < samples; ++j)
+//		{
+//			auto start = std::chrono::high_resolution_clock::now();
+//
+//			for (int i{}; i < size; i += stepsize)
+//			{
+//				chungus->at(i).ID *= 2;
+//			}
+//
+//			auto end = std::chrono::high_resolution_clock::now();
+//			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+//			durations.push_back(deltaT);
+//		}
+//		durations.erase(std::max_element(durations.begin(), durations.end()));
+//		durations.erase(std::min_element(durations.begin(), durations.end()));
+//
+//		long long longSize{ long long(durations.size()) };
+//
+//		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
+//		averages.push_back(average);
+//
+//		xData.push_back((float)stepsize);
+//
+//		durations.clear();
+//	}
+//	const int dataBufferSize{ (int)averages.size() };
+//	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
+//	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataX[i] = xData[i];
+//	}
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataY[i] = averages[i];
+//	}
+//
+//	plotConfig.values.xs = pDataX.get(); // this line is optional
+//	plotConfig.values.ys = pDataY.get();
+//	plotConfig.values.count = dataBufferSize;
+//	plotConfig.scale.min = 0;
+//	plotConfig.scale.max = pDataY[0];
+//	plotConfig.tooltip.show = true;
+//	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
+//	plotConfig.grid_x.show = true;
+//	plotConfig.grid_y.show = true;
+//	plotConfig.frame_size = ImVec2(200, 200);
+//	plotConfig.line_thickness = 2.f;
+//	plotConfig.values.color = ImColor{ 200, 150, 0 };
+//
+//	chungus->clear();
+//	delete chungus;
+//}
+//
+//void dae::ImGUIComponenent::TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const
+//{
+//	const size_t size = 10'000'000;
+//	auto chungus = new std::vector<GameObject3DAlt>(size);
+//
+//	delete plotConfig.values.ys;
+//
+//	std::vector<float> averages{};
+//	std::vector<float> xData{};
+//
+//	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+//	{
+//		std::vector<long long> durations{};
+//		for (int j{}; j < samples; ++j)
+//		{
+//			auto start = std::chrono::high_resolution_clock::now();
+//
+//			for (int i{}; i < size; i += stepsize)
+//			{
+//				chungus->at(i).ID *= 2;
+//			}
+//
+//			auto end = std::chrono::high_resolution_clock::now();
+//			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+//			durations.push_back(deltaT);
+//		}
+//		durations.erase(std::max_element(durations.begin(), durations.end()));
+//		durations.erase(std::min_element(durations.begin(), durations.end()));
+//
+//		long long longSize{ long long(durations.size()) };
+//
+//		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
+//		averages.push_back(average);
+//
+//		xData.push_back((float)stepsize);
+//		durations.clear();
+//	}
+//	const int dataBufferSize{ (int)averages.size() };
+//	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
+//	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataX[i] = xData[i];
+//	}
+//
+//	for (size_t i{}; i < dataBufferSize; ++i)
+//	{
+//		pDataY[i] = averages[i];
+//	}
+//
+//	plotConfig.values.xs = pDataX.get(); // this line is optional
+//	plotConfig.values.ys = pDataY.get();
+//	plotConfig.values.count = dataBufferSize;
+//	plotConfig.scale.min = 0;
+//	plotConfig.scale.max = pDataY[0];
+//	plotConfig.tooltip.show = true;
+//	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
+//	plotConfig.grid_x.show = true;
+//	plotConfig.grid_y.show = true;
+//	plotConfig.frame_size = ImVec2(200, 200);
+//	plotConfig.line_thickness = 2.f;
+//	plotConfig.values.color = ImColor{ 200, 150, 0 };
+//
+//
+//	chungus->clear();
+//	delete chungus;
+//}
+
+#pragma endregion
+
+#pragma region ColliderComponent
+
+dae::ColliderComponent::ColliderComponent(GameObject* go, std::string tag)
+	: Component(go), m_Tag{ tag }
 {
-	//GUI here
-	//Static because stuff didn't work as member variable
-	static int nrOfSamples{ 10 };
-	static bool showIntGraph{ false };
-	ImGui::PlotConfig intPlotConfig{};
-
-	ImGui::Begin("Exercise 2"); //Create a window called "Exercise 2"
-	ImGui::InputInt("samples", &nrOfSamples);
-	if (ImGui::Button("Trash the Cache") && !showIntGraph)
-	{
-		showIntGraph = true;
-		TrashTheCacheInts(intPlotConfig, nrOfSamples);
-		*m_pIntPlotConfig = ImGui::PlotConfig{ intPlotConfig };
-	}
-
-	if (showIntGraph)
-	{
-		ImGui::Plot("Trash the Cache Ints", *m_pIntPlotConfig);
-	}
-	ImGui::End();
-
-	static bool showGameObjectGraph{ false };
-	ImGui::PlotConfig gameObjectPlotConfig{};
-	ImGui::PlotConfig gameObjectAltPlotConfig{};
-
-	ImGui::Begin("Exercise 3"); //Create a window called "Exercise 3"
-	ImGui::InputInt("samples", &nrOfSamples);
-	if (ImGui::Button("Trash the Cache") && !showGameObjectGraph)
-	{
-		showGameObjectGraph = true;
-		TrashTheCacheGameObjects(gameObjectPlotConfig, nrOfSamples);
-		*m_pGameObjectPlotConfig = ImGui::PlotConfig{ gameObjectPlotConfig };
-
-		TrashTheCacheGameObjectAlts(gameObjectAltPlotConfig, nrOfSamples);
-		*m_pGameObjectAltPlotConfig = ImGui::PlotConfig{ gameObjectAltPlotConfig };
-	}
-
-	if (showGameObjectGraph)
-	{
-		ImGui::Plot("Trash the Cache GameObjects", *m_pGameObjectPlotConfig);
-		ImGui::Plot("Trash the Cache GameObjectAlts", *m_pGameObjectAltPlotConfig);
-	}
-
-	ImGui::End();
+	CollisionManager::GetInstance().AddCollider(this);
+	//std::cout << "Added collider to manager!\n";
 }
 
-void dae::ImGUIComponenent::TrashTheCacheInts(ImGui::PlotConfig& plotConfig, int samples) const
+bool dae::ColliderComponent::IsColliding(ColliderComponent* otherCollider) const
 {
-	const size_t size = 10'000'000;
-	auto chungus = new std::vector<int>(size, 1);
-
-	delete plotConfig.values.ys;
-
-	std::vector<float> averages{};
-	std::vector<float> xData{};
-
-	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
+	// if has the same tag, do not compare! ignore collision
+	std::string otherTag = otherCollider->GetTag();
+	if (m_Tag == otherTag)
 	{
-		std::vector<long long> durations{};
-		for (int j{}; j < samples; ++j)
-		{
-			auto start = std::chrono::high_resolution_clock::now();
-
-			for (int i{}; i < size; i += stepsize)
-			{
-				chungus->at(i) *= 2;
-			}
-
-			auto end = std::chrono::high_resolution_clock::now();
-			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			durations.push_back(deltaT);
-		}
-		durations.erase(std::max_element(durations.begin(), durations.end()));
-		durations.erase(std::min_element(durations.begin(), durations.end()));
-
-		long long longSize{ long long(durations.size()) };
-
-		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
-		averages.push_back(average);
-
-		xData.push_back((float)stepsize);
-		durations.clear();
-	}
-	const int dataBufferSize{ (int)averages.size() };
-	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
-	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
-
-	for (size_t i{}; i < dataBufferSize; ++i)
-	{
-		pDataX[i] = xData[i];
+		return false;
 	}
 
-	for (size_t i{}; i < dataBufferSize; ++i)
+	float xMax = m_ColliderBox.xMin + m_ColliderBox.width;
+	float yMax = m_ColliderBox.yMin + m_ColliderBox.height;
+
+	Collider otherBox = otherCollider->m_ColliderBox;
+
+	if (xMax < otherBox.xMin || (otherBox.xMin + otherBox.width) < m_ColliderBox.xMin)
 	{
-		pDataY[i] = averages[i];
+		return false;
 	}
 
-	plotConfig.values.xs = pDataX.get(); // this line is optional
-	plotConfig.values.ys = pDataY.get();
-	plotConfig.values.count = dataBufferSize;
-	plotConfig.scale.min = 0;
-	plotConfig.scale.max = pDataY[0];
-	plotConfig.tooltip.show = true;
-	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
-	plotConfig.grid_x.show = true;
-	plotConfig.grid_y.show = true;
-	plotConfig.frame_size = ImVec2(200, 200);
-	plotConfig.line_thickness = 2.f;
-	plotConfig.values.color = ImColor{ 200, 150, 0 };
+	if ((m_ColliderBox.yMin > otherBox.yMin + otherBox.height) || otherBox.yMin > yMax)
+	{
+		return false;
+	}
 
-	chungus->clear();
-	delete chungus;
+	return true;
 }
 
-void dae::ImGUIComponenent::TrashTheCacheGameObjects(ImGui::PlotConfig& plotConfig, int samples) const
+void dae::ColliderComponent::Update([[maybe_unused]] float deltaT)
 {
-	const size_t size = 10'000'000;
-	auto chungus = new std::vector<GameObject3D>(size);
+	const auto myPosition = GetOwner()->GetComponent<Transform>()->GetPosition();
 
-	delete plotConfig.values.ys;
-
-	std::vector<float> averages{};
-	std::vector<float> xData{};
-
-	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
-	{
-		std::vector<long long> durations{};
-		for (int j{}; j < samples; ++j)
-		{
-			auto start = std::chrono::high_resolution_clock::now();
-
-			for (int i{}; i < size; i += stepsize)
-			{
-				chungus->at(i).ID *= 2;
-			}
-
-			auto end = std::chrono::high_resolution_clock::now();
-			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			durations.push_back(deltaT);
-		}
-		durations.erase(std::max_element(durations.begin(), durations.end()));
-		durations.erase(std::min_element(durations.begin(), durations.end()));
-
-		long long longSize{ long long(durations.size()) };
-
-		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
-		averages.push_back(average);
-
-		xData.push_back((float)stepsize);
-
-		durations.clear();
-	}
-	const int dataBufferSize{ (int)averages.size() };
-	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
-	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
-
-	for (size_t i{}; i < dataBufferSize; ++i)
-	{
-		pDataX[i] = xData[i];
-	}
-
-	for (size_t i{}; i < dataBufferSize; ++i)
-	{
-		pDataY[i] = averages[i];
-	}
-
-	plotConfig.values.xs = pDataX.get(); // this line is optional
-	plotConfig.values.ys = pDataY.get();
-	plotConfig.values.count = dataBufferSize;
-	plotConfig.scale.min = 0;
-	plotConfig.scale.max = pDataY[0];
-	plotConfig.tooltip.show = true;
-	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
-	plotConfig.grid_x.show = true;
-	plotConfig.grid_y.show = true;
-	plotConfig.frame_size = ImVec2(200, 200);
-	plotConfig.line_thickness = 2.f;
-	plotConfig.values.color = ImColor{ 200, 150, 0 };
-
-	chungus->clear();
-	delete chungus;
+	m_ColliderBox.xMin = myPosition.x;
+	m_ColliderBox.yMin = myPosition.y;
 }
 
-void dae::ImGUIComponenent::TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const
+void dae::ColliderComponent::SetDimensions(float width, float height)
 {
-	const size_t size = 10'000'000;
-	auto chungus = new std::vector<GameObject3DAlt>(size);
+	// Sets the dimensions of the bounding box
+	m_ColliderBox.width = width;
+	m_ColliderBox.height = height;
+}
 
-	delete plotConfig.values.ys;
-
-	std::vector<float> averages{};
-	std::vector<float> xData{};
-
-	for (int stepsize{ 1 }; stepsize <= 1024; stepsize *= 2)
-	{
-		std::vector<long long> durations{};
-		for (int j{}; j < samples; ++j)
-		{
-			auto start = std::chrono::high_resolution_clock::now();
-
-			for (int i{}; i < size; i += stepsize)
-			{
-				chungus->at(i).ID *= 2;
-			}
-
-			auto end = std::chrono::high_resolution_clock::now();
-			auto deltaT = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-			durations.push_back(deltaT);
-		}
-		durations.erase(std::max_element(durations.begin(), durations.end()));
-		durations.erase(std::min_element(durations.begin(), durations.end()));
-
-		long long longSize{ long long(durations.size()) };
-
-		float average{ (float)std::accumulate(durations.begin(), durations.end(), 0LL) / longSize };
-		averages.push_back(average);
-
-		xData.push_back((float)stepsize);
-		durations.clear();
-	}
-	const int dataBufferSize{ (int)averages.size() };
-	static auto pDataX = std::make_unique<float[]>(dataBufferSize);
-	static auto pDataY = std::make_unique<float[]>(dataBufferSize);
-
-	for (size_t i{}; i < dataBufferSize; ++i)
-	{
-		pDataX[i] = xData[i];
-	}
-
-	for (size_t i{}; i < dataBufferSize; ++i)
-	{
-		pDataY[i] = averages[i];
-	}
-
-	plotConfig.values.xs = pDataX.get(); // this line is optional
-	plotConfig.values.ys = pDataY.get();
-	plotConfig.values.count = dataBufferSize;
-	plotConfig.scale.min = 0;
-	plotConfig.scale.max = pDataY[0];
-	plotConfig.tooltip.show = true;
-	plotConfig.tooltip.format = "x=%.2f, y=%.2f";
-	plotConfig.grid_x.show = true;
-	plotConfig.grid_y.show = true;
-	plotConfig.frame_size = ImVec2(200, 200);
-	plotConfig.line_thickness = 2.f;
-	plotConfig.values.color = ImColor{ 200, 150, 0 };
-
-
-	chungus->clear();
-	delete chungus;
+void dae::ColliderComponent::SetPosition(float xPos, float yPos)
+{
+	m_ColliderBox.xMin = xPos;
+	m_ColliderBox.yMin = yPos;
 }
 
 #pragma endregion

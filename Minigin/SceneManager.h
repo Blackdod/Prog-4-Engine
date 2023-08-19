@@ -16,6 +16,9 @@ namespace dae
 		void FixedUpdate(float dt);
 		void Render();
 		void RenderUI();
+
+		std::shared_ptr<Scene> GetScene() const { return m_scenes[0]; }
+
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
