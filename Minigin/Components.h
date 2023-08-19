@@ -172,45 +172,4 @@ namespace dae
 		std::unique_ptr<ImGui::PlotConfig> m_pGameObjectAltPlotConfig{ std::make_unique<ImGui::PlotConfig>() };
 		void TrashTheCacheGameObjectAlts(ImGui::PlotConfig& plotConfig, int samples) const;
 	};
-
-	class LifeComponent final : public Component, public Observer
-	{
-	public:
-		LifeComponent(GameObject* pOwner, const std::shared_ptr<Subject>& subject, int lives = 3)
-			:Component(pOwner)
-			,m_pSubject(subject)
-			,m_lives(lives)
-		{
-			m_pOwnerTransform = pOwner->GetComponent<Transform>();
-			subject->AddObserver(this);
-		}
-
-		int GetLives() const { return m_lives; }
-		void Die();
-
-		void OnNotify(const GameObject& gameObject, Event eventType, int optionalValue = 0) override;
-
-		std::shared_ptr<Subject> m_pSubject{};
-		
-	private:
-		void HandleEvents(Event eventType, int optionalValue = 0);
-		void Respawn();
-
-		int m_lives;
-		Transform* m_pOwnerTransform;
-	};
-
-	class PlayerComponent final : public Component
-	{
-	public:
-		PlayerComponent(GameObject* pOwner, int idx)
-			:Component(pOwner)
-			, m_Idx(idx)
-		{
-		}
-
-		int GetIndex() const { return m_Idx; }
-	private:
-		int m_Idx;
-	};
 }

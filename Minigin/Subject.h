@@ -1,21 +1,39 @@
 #pragma once
-#include <list>
+#include <vector>
 #include <memory>
 
-#include "Event.h"
+#include "Observer.h"
 
 namespace dae
 {
-	class GameObject;
-	class Observer;
-	class Subject final
-	{
+	template<typename... Args>
+	class Subject final {
+		std::vector<Observer<Args...>*> m_observers;
 	public:
-		void AddObserver(Observer* observer);
-		void RemoveObserver(const Observer* observer);
-		void Notify(const GameObject& other, Event event, int optionalValue = 0) const;
-	private:
-		std::list<Observer*> m_Observers;
-
+		~Subject()
+		{
+			for (auto& observer : m_observers)
+			{
+				observer->OnSubjectDestroy();
+			}
+		}
+		void AddObserver(Observer<Args...>* observer)
+		{
+			m_observers.push_back(observer);
+		}
+		void RemoveObserver(Observer<Args...>* observer)
+		{
+			m_observers.erase(std::remove(
+				m_observers.begin(),
+				m_observers.end(), observer),
+				m_observers.end());
+		}
+		void Notify(Args... args)
+		{
+			for (auto& observer : m_observers)
+			{
+				observer->HandleEvent(args...);
+			}
+		}
 	};
 }

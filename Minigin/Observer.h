@@ -1,15 +1,13 @@
 #pragma once
 
-#include "Event.h"
-
-namespace dae {
-
-	class GameObject;
+namespace dae
+{
+	template<typename... Args>
 	class Observer
 	{
 	public:
 		virtual ~Observer() = default;
-
-		virtual void OnNotify(const GameObject& gameObject, Event event, int optionalValue = 0) = 0;
+		virtual void HandleEvent(Args... args) = 0;
+		virtual void OnSubjectDestroy() = 0;
 	};
 }
