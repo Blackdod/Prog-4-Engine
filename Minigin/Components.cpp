@@ -9,7 +9,6 @@
 #include "CollisionManager.h"
 
 #include <chrono>
-#include <numeric>
 
 #pragma region Transform
 

@@ -48,7 +48,7 @@ private:
 
 	glm::vec3 m_StartPosition = glm::vec3(-50, -50, -50);
 
-	int m_Lives{3};
+	int m_Lives{4}; //3+1
 	std::vector <std::shared_ptr<dae::GameObject>>  m_LivesArr;
 
 	float m_RespawnTimer = 2;
@@ -67,4 +67,32 @@ public:
 	void AddPoints();
 private:
 	int m_PointAmnt{ 10 };
+};
+
+class BlinkyComponent : public dae::Component
+{
+public:
+	BlinkyComponent(dae::GameObject* owner, dae::GameObject* player, int ghostNr);
+
+	void Update(float dt) override;
+
+	const Direction& GetDirection() const { return m_Direction; }
+
+private:
+	void Respawn();
+	bool CollidesInTargetDir(float dt);
+
+	Direction m_Direction = Direction::NONE;
+	Direction m_TargetDirection = Direction::NONE;
+
+	glm::vec3 m_StartPosition = glm::vec3(-50, -50, -50);
+
+	float m_RespawnTimer = 5;
+	float m_MovementSpeed = 50.f;
+	dae::GameObject* m_pPlayer{nullptr};
+
+	const float m_StartTimer{ 60.f };
+	float m_CurrentWaitTime{ 0.f };
+
+	int m_GhostNr{0};
 };

@@ -1,11 +1,9 @@
 #include "LevelCreator.h"
 #include <rapidjson.h>
 #include <document.h>
-#include <stream.h>
 #include <filereadstream.h>
 
 #include <iostream>
-#include "HelperStructs.h"
 #include "Scene.h"
 #include "Components.h"
 #include "GameObject.h"

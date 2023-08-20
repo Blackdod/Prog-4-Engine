@@ -71,6 +71,7 @@ void load()
 
 	playerComponent->AddObserver(livesdisplay->GetComponent<LivesDisplayComponent>());
 	playerComponent->AddObserver(scoreDisplay->GetComponent<ScoreDisplayComponent>());
+	playerComponent->Start();
 
 	const auto moveUp = std::make_shared<MoveCommand>(pacman_go.get(), Direction::UP);
 	const auto moveDown = std::make_shared<MoveCommand>(pacman_go.get(), Direction::DOWN);
@@ -96,7 +97,21 @@ void load()
 	LevelCreator::GetInstance().CreateLevel(L"../Data/level1.json", &scene);
 	LevelCreator::GetInstance().SetPlayer1(pacman_go.get());
 
-	playerComponent->Start();
+	// BLINKY
+	float blinkX{ 312.f }, blinkY{ 256.f };
+	InputManager::GetInstance().AddPlayer();
+	auto blinky_go = std::make_shared<GameObject>();
+	transform = &blinky_go->AddComponent<Transform>();
+	transform->SetPosition({ blinkX, blinkY, 0.f });
+	blinky_go.get()->SetLocalPosition(glm::vec3{blinkX, blinkY, 0.f});
+	blinky_go.get()->SetStartPosition(glm::vec3{blinkX, blinkY, 0.f});
+	RenderComponent* blinkyRender = &blinky_go->AddComponent<RenderComponent>();
+	blinkyRender->SetTexture("blinky.png");
+	&blinky_go->AddComponent<BlinkyComponent>(pacman_go.get(), 0);
+	ColliderComponent* blinkyCollider = &blinky_go->AddComponent<ColliderComponent>("GHOST");
+	blinkyCollider->SetDimensions(15.2f, 15.2f);
+	blinkyCollider->SetPosition(blinkX, blinkY);
+	scene.Add(blinky_go);
 }
 
 int main(int, char* []) {
