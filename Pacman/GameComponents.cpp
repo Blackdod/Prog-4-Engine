@@ -10,7 +10,9 @@
 #pragma region Player
 
 PlayerComponent::PlayerComponent(dae::GameObject* owner, bool isGhost, int playerNr)
-	: Component{ owner }, m_IsGhost{ isGhost }
+	:Component{ owner }
+	,m_IsGhost{ isGhost }
+	,m_PlayerNr{ playerNr }
 {
 	m_PlayerSubject = std::make_unique<dae::Subject<Event>>();
 }
@@ -93,6 +95,8 @@ void PlayerComponent::Update(float dt)
 	{
 		pTransform->SetPosition(targetPos);
 	}
+
+	GetChangeableOwner()->SetLocalPosition(pTransform->GetPosition());
 }
 
 void PlayerComponent::Initialize()

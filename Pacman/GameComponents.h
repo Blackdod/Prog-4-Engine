@@ -24,6 +24,8 @@ public:
 	void Start();
 	void Die();
 
+	const Direction& GetDirection() const { return m_Direction; }
+
 private:
 	void Respawn();
 	bool CollidesInTargetDir(float dt);
@@ -47,4 +49,6 @@ private:
 	float m_MovementSpeed = 50.f;
 
 	std::unique_ptr<dae::Subject<Event>> m_PlayerSubject;
+
+	int m_PlayerNr{};
 };
