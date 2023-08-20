@@ -203,6 +203,7 @@ void PlayerComponent::Die()
 		--m_Lives;
 	}
 	m_pPlayerSubject->Notify(Event::PlayerDied);
+	Respawn();
 }
 
 #pragma endregion
@@ -360,6 +361,12 @@ void BlinkyComponent::Update(float dt)
 		{
 			if (collision->GetTag() == "PICKUP")
 			{
+				continue;
+			}
+
+			if (collision->GetTag() == "PLAYER") //Dont work
+			{
+				m_pPlayer->GetComponent<PlayerComponent>()->Die();
 				continue;
 			}
 			// if is colliding with something after an update, don't update movement!
