@@ -2,36 +2,23 @@
 #include "Command.h"
 #include "GameComponents.h"
 
-class UpCommand : public dae::Command
+class DieCommand : public dae::Command
 {
 public:
-	void Execute([[maybe_unused]] float deltaTime) override;
-
-	void Up(PlayerComponent* player);
+	DieCommand(dae::GameObject* pOwner) : Command(), m_pOwner(pOwner){};
+	virtual void Execute([[maybe_unused]] float deltaTime) override;
+private:
+	dae::GameObject* m_pOwner{};
 };
 
-class DownCommand : public dae::Command
+class MoveCommand : public dae::Command
 {
 public:
-	void Execute([[maybe_unused]] float deltaTime) override;
-
-	void Down(PlayerComponent* player);
-};
-
-class RightCommand : public dae::Command
-{
-public:
-	void Execute([[maybe_unused]] float deltaTime) override;
-
-	void Right(PlayerComponent* player);
-};
-
-class LeftCommand : public dae::Command
-{
-public:
-	void Execute([[maybe_unused]] float deltaTime) override;
-
-	void Left(PlayerComponent* player);
+	MoveCommand(dae::GameObject* pOwner, Direction dir) : Command(), m_Dir{ dir }, m_pOwner(pOwner) {};
+	virtual void Execute([[maybe_unused]] float deltaTime) override;
+private:
+	Direction m_Dir{};
+	dae::GameObject* m_pOwner{};
 };
 
 class StartCommand : public dae::Command
