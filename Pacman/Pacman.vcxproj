@@ -151,12 +151,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Displays.cpp" />
     <ClCompile Include="GameCommands.cpp" />
     <ClCompile Include="GameComponents.cpp" />
     <ClCompile Include="LevelCreator.cpp" />
     <ClCompile Include="Pacman.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Displays.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="GameCommands.h" />

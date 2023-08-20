@@ -15,6 +15,7 @@ namespace dae
 		void SetPlayer1(GameObject* player1) { m_pPlayer1 = player1; };
 	private:
 		void CreateWall(Scene* scene, float xPos, float yPos) const;
+		void SpawnDot(Scene* scene, float xPos, float yPos) const;
 		GameObject* m_pPlayer1 = nullptr;
 	};
 }

@@ -2,6 +2,7 @@
 #include "Components.h"
 #include "Enums.h"
 #include "Events.h"
+#include "Subject.h"
 
 class PlayerComponent : public dae::Component
 {
@@ -18,8 +19,13 @@ public:
 	int GetScore() const { return m_Score; }
 	bool IsGhost() const { return m_IsGhost; }
 	void AddObserver(dae::Observer<Event>* obs);
+	void RemoveObserver(dae::Observer<Event>* obs);
 
-	void AddScore(int amount) { m_Score += amount; };
+	void AddScore(int amount)
+	{
+		m_Score += amount;
+		m_pPlayerSubject->Notify(Event::AddPoints);
+	}
 
 	void Start();
 	void Die();
@@ -42,13 +48,23 @@ private:
 
 	glm::vec3 m_StartPosition = glm::vec3(-50, -50, -50);
 
-	int m_Lives = 3;
+	int m_Lives{3};
 	std::vector <std::shared_ptr<dae::GameObject>>  m_LivesArr;
 
 	float m_RespawnTimer = 2;
 	float m_MovementSpeed = 50.f;
 
-	std::unique_ptr<dae::Subject<Event>> m_PlayerSubject;
+	std::unique_ptr<dae::Subject<Event>> m_pPlayerSubject;
 
 	int m_PlayerNr{};
+};
+
+class PacDotComponent : public dae::Component
+{
+public:
+	PacDotComponent(dae::GameObject* owner);
+	~PacDotComponent() override;
+	void AddPoints();
+private:
+	int m_PointAmnt{ 10 };
 };

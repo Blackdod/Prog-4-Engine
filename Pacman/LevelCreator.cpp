@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "Components.h"
 #include "GameObject.h"
+#include "GameComponents.h"
 
 using namespace std;
 
@@ -62,7 +63,6 @@ bool dae::LevelCreator::CreateLevel(const std::wstring& filePath, Scene* scene)
 		{
 			float posX = startPos.x + (j * tileSize); //* tileSize;
 
-
 			//std::cout << "row = " << j << "\n";
 
 			switch (levelLayOut[i * nrCols + j])
@@ -71,6 +71,7 @@ bool dae::LevelCreator::CreateLevel(const std::wstring& filePath, Scene* scene)
 				GetInstance().CreateWall(scene, posX, posY);
 				break;
 			default:
+				GetInstance().SpawnDot(scene, posX, posY);
 				break;
 			}
 		}
@@ -81,7 +82,7 @@ bool dae::LevelCreator::CreateLevel(const std::wstring& filePath, Scene* scene)
 
 void dae::LevelCreator::CreateWall(Scene* scene, float xPos, float yPos) const
 {
-	auto wall = std::make_shared<GameObject>();
+	const auto wall = std::make_shared<GameObject>();
 	Transform* wallTransform = &wall->AddComponent<Transform>();
 	wallTransform->SetPosition(xPos, yPos, 0.f);
 	RenderComponent* wallRenderer = &wall->AddComponent<RenderComponent>();
@@ -94,4 +95,22 @@ void dae::LevelCreator::CreateWall(Scene* scene, float xPos, float yPos) const
 	wall.get()->SetLocalPosition(pos);
 
 	scene->Add(wall);
+}
+
+void dae::LevelCreator::SpawnDot(Scene* scene, float xPos, float yPos) const
+{
+	const auto pDot = std::make_shared<GameObject>();
+	Transform* dotTransform = &pDot->AddComponent<Transform>();
+	dotTransform->SetPosition(xPos, yPos, 0.f);
+	RenderComponent* dotRenderer = &pDot->AddComponent<RenderComponent>();
+	dotRenderer->SetTexture("pill.png");
+	ColliderComponent* dotCollider = &pDot->AddComponent<ColliderComponent>("PICKUP");
+	dotCollider->SetDimensions(16.f, 16.f);
+	dotCollider->SetPosition(xPos, yPos);
+	pDot->AddComponent<PacDotComponent>();
+
+	const glm::vec3 pos{xPos, yPos, 0.f};
+	pDot.get()->SetLocalPosition(pos);
+
+	scene->Add(pDot);
 }

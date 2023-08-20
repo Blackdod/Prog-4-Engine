@@ -14,6 +14,7 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "Components.h"
+#include "Displays.h"
 #include "ResourceManager.h"
 #include "GameObject.h"
 #include "InputManager.h"
@@ -26,43 +27,14 @@ void load()
 
 	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
 
-	// Movement directions
-	glm::vec3 up = { 0.f,-1.f,0.f };
-	glm::vec3 down = { 0.f,1.f,0.f };
-	glm::vec3 right = { 1.f,0.f,0.f };
-	glm::vec3 left = { -1.f,0.f,0.f };
-
-	SDL_Color textColor{ 255,255,255 };
-	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto livesFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 25);
-
-	//// LIVES
-	//auto livesdisplay = std::make_shared<GameObject>();
-	//auto transform = livesdisplay->AddComponent<Transform>();
-	//transform->SetLocalPosition({ 0.f, 15.f, 0.f });
-	//
-	//// Make sure to add the render component before the text component!
-	//auto renderer = livesdisplay->AddComponent<RenderComponent>();
-	//auto text_comp = livesdisplay->AddComponent<TextComponent>("Lives: ", livesFont, textColor);
-	//text_comp->Init();
-	//livesdisplay->AddComponent<LivesDisplayComponent>();
-	//scene.Add(livesdisplay);
-	//
-	//auto scoreDisplay = std::make_shared<GameObject>();
-	//transform = scoreDisplay->AddComponent<Transform>();
-	//transform->SetLocalPosition({ 150.f, 15.f, 0.f });
-	//
-	//renderer = scoreDisplay->AddComponent<RenderComponent>();
-	//text_comp = scoreDisplay->AddComponent<TextComponent>("Score: ", livesFont, textColor);
-	//text_comp->Init();
-	//scoreDisplay->AddComponent<ScoreDisplayComponent>();
-	//scene.Add(scoreDisplay);
-
-	float playX{ 347.f }, playY{ 60.f };
+	// PACMAN
+	float playX{ 312.f }, playY{ 296.2f };
 	InputManager::GetInstance().AddPlayer();
 	auto pacman_go = std::make_shared<GameObject>();
 	Transform* transform = &pacman_go->AddComponent<Transform>();
 	transform->SetPosition({ playX, playY, 0.f });
+	pacman_go.get()->SetLocalPosition(glm::vec3{playX, playY, 0.f});
+	pacman_go.get()->SetStartPosition(glm::vec3{playX, playY, 0.f});
 	RenderComponent* pacRender = &pacman_go->AddComponent<RenderComponent>();
 	pacRender->SetTexture("pacman.png");
 	PlayerComponent* playerComponent = &pacman_go->AddComponent<PlayerComponent>(false, 0);
@@ -70,16 +42,42 @@ void load()
 	playerCollider->SetDimensions(15.2f, 15.2f);
 	playerCollider->SetPosition(playX, playY);
 
-	//playerComponent->AddObserver(livesdisplay->GetComponent<LivesDisplayComponent>());
-	//playerComponent->AddObserver(scoreDisplay->GetComponent<ScoreDisplayComponent>());
-	playerComponent->Start();
+	// LIVES
+	SDL_Color textColor{ 255,255,255 };
+	auto livesFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 18);
+	auto scoreFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 24);
 
-	auto moveUp = std::make_shared<MoveCommand>(pacman_go.get(), Direction::UP);
-	auto moveDown = std::make_shared<MoveCommand>(pacman_go.get(), Direction::DOWN);
-	auto moveRight = std::make_shared<MoveCommand>(pacman_go.get(), Direction::RIGHT);
-	auto moveLeft = std::make_shared<MoveCommand>(pacman_go.get(), Direction::LEFT);
+	const auto livesdisplay = std::make_shared<GameObject>();
+	transform = &livesdisplay->AddComponent<Transform>();
+	transform->SetPosition({ 0.f, 15.f, 0.f });
+	livesdisplay.get()->SetLocalPosition(glm::vec3{35.f, 15.f, 0.f});
 
-	auto dieCommand = std::make_shared<DieCommand>(pacman_go.get());
+	// Make sure to add the render component before the text component!
+	livesdisplay->AddComponent<RenderComponent>();
+	livesdisplay->AddComponent<TextComponent>("Lives: ", livesFont, textColor);
+	livesdisplay->AddComponent<LivesDisplayComponent>(pacman_go.get());
+	scene.Add(livesdisplay);
+
+	// SCORES
+	auto scoreDisplay = std::make_shared<GameObject>();
+	transform = &scoreDisplay->AddComponent<Transform>();
+	transform->SetPosition({ 300.f, 15.f, 0.f });
+	scoreDisplay.get()->SetLocalPosition(glm::vec3{300.f, 15.f, 0.f});
+	
+	scoreDisplay->AddComponent<RenderComponent>();
+	scoreDisplay->AddComponent<TextComponent>("Score: ", scoreFont, textColor);
+	scoreDisplay->AddComponent<ScoreDisplayComponent>(pacman_go.get());
+	scene.Add(scoreDisplay);
+
+	playerComponent->AddObserver(livesdisplay->GetComponent<LivesDisplayComponent>());
+	playerComponent->AddObserver(scoreDisplay->GetComponent<ScoreDisplayComponent>());
+
+	const auto moveUp = std::make_shared<MoveCommand>(pacman_go.get(), Direction::UP);
+	const auto moveDown = std::make_shared<MoveCommand>(pacman_go.get(), Direction::DOWN);
+	const auto moveRight = std::make_shared<MoveCommand>(pacman_go.get(), Direction::RIGHT);
+	const auto moveLeft = std::make_shared<MoveCommand>(pacman_go.get(), Direction::LEFT);
+
+	const auto dieCommand = std::make_shared<DieCommand>(pacman_go.get());
 
 	// UP
 	InputManager::GetInstance().AddCommand(XBox360Controller::Button::DPadUp, SDL_SCANCODE_W, moveUp, 0, InputManager::KeyState::Down);
@@ -96,6 +94,9 @@ void load()
 	scene.Add(pacman_go);
 
 	LevelCreator::GetInstance().CreateLevel(L"../Data/level1.json", &scene);
+	LevelCreator::GetInstance().SetPlayer1(pacman_go.get());
+
+	playerComponent->Start();
 }
 
 int main(int, char* []) {

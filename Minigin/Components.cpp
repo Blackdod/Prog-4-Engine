@@ -74,12 +74,20 @@ dae::TextComponent::TextComponent(GameObject* pOwner, const std::string& text, s
 {
 }
 
+dae::TextComponent::TextComponent(GameObject* pOwner, const std::string& text, std::shared_ptr<Font> font, const SDL_Color& color)
+	:Component(pOwner)
+	, m_needsUpdate(true)
+	, m_text(text)
+	, m_font(std::move(font))
+	,m_Color(color)
+{
+}
+
 void dae::TextComponent::Update([[maybe_unused]] float deltaT)
 {
 	if (m_needsUpdate)
 	{
-		const SDL_Color color{ 255,255,255 };
-		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), color);
+		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), m_Color);
 		if (surf == nullptr)
 		{
 			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
@@ -102,12 +110,17 @@ void dae::TextComponent::SetText(const std::string& text)
 	m_needsUpdate = true;
 }
 
-//void dae::TextComponent::SetColor(Uint8 r, Uint8 g, Uint8 b)
-//{
-//	m_color.r = r;
-//	m_color.g = g;
-//	m_color.b = b;
-//}
+void dae::TextComponent::SetColor(Uint8 r, Uint8 g, Uint8 b)
+{
+	m_Color.r = r;
+	m_Color.g = g;
+	m_Color.b = b;
+}
+
+void dae::TextComponent::SetColor(const SDL_Color& color)
+{
+	m_Color = color;
+}
 
 #pragma endregion
 
@@ -425,6 +438,11 @@ bool dae::ColliderComponent::IsColliding(ColliderComponent* otherCollider) const
 {
 	// if has the same tag, do not compare! ignore collision
 	std::string otherTag = otherCollider->GetTag();
+	if(otherTag.empty())
+	{
+		return false;
+	}
+
 	if (m_Tag == otherTag)
 	{
 		return false;
