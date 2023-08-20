@@ -63,17 +63,17 @@ void XBox360Controller::Update()
 	pImpl->Update();
 }
 
-bool XBox360Controller::IsDown(ControllerButton button) const
+bool XBox360Controller::IsDown(Button button) const
 {
 	return pImpl->IsDownThisFrame(static_cast<unsigned int>(button));
 }
 
-bool XBox360Controller::IsUp(ControllerButton button) const
+bool XBox360Controller::IsUp(Button button) const
 {
 	return pImpl->IsUpThisFrame(static_cast<unsigned int>(button));
 }
 
-bool XBox360Controller::IsBeingPressed(ControllerButton button) const
+bool XBox360Controller::IsBeingPressed(Button button) const
 {
 	return pImpl->IsBeingPressed(static_cast<unsigned int>(button));
 }

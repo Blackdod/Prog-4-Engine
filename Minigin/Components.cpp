@@ -148,8 +148,8 @@ void dae::Encircle::Update(float deltaT)
 	m_Offset.x =  m_Distance * cosf(multiplier * ( static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
 	m_Offset.y =  m_Distance * sinf(multiplier * (static_cast<float>(2 * M_PI) / m_SecPerRotation) * m_Time);
 	
-	GetOwner()->SetLocalPosition(glm::vec3(m_Offset.x, m_Offset.y, 0.f));
-	GetOwner()->SetPositionDirty();
+	GetChangeableOwner()->SetLocalPosition(glm::vec3(m_Offset.x, m_Offset.y, 0.f));
+	GetChangeableOwner()->SetPositionDirty();
 }
 
 #pragma endregion

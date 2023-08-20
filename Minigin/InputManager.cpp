@@ -12,113 +12,144 @@
 
 namespace dae
 {
-	InputManager::InputManager()
+	InputManager::~InputManager()
 	{
-		DWORD dwResult;
-		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+		for (auto element : m_KeyCommands)
 		{
-			XINPUT_STATE state;
-			ZeroMemory(&state, sizeof(XINPUT_STATE));
-		
-			dwResult = XInputGetState(i, &state);
-		
-			if (dwResult == ERROR_SUCCESS)
-			{
-				m_pGamePads.push_back(std::make_unique<XBox360Controller>(static_cast<unsigned int>(i)));
-			}
-			else
-			{
-				std::cout << "There is no controller with idx: " << i << std::endl;
-			}
+			delete element;
+			element = nullptr;
 		}
 	}
 
-	bool InputManager::ProcessInput(float deltaTime)
+	bool InputManager::ProcessInput(float deltaT)
 	{
 		SDL_Event e;
-		const Uint8* keyState = SDL_GetKeyboardState(NULL);
+		while (SDL_PollEvent(&e)) {
+			SDL_GetMouseState(&m_MousePos.x, &m_MousePos.y);
 
-		for (auto commandsIterator = m_KeyboardCommands.begin(); commandsIterator != m_KeyboardCommands.end(); ++commandsIterator)
-		{
-			if(keyState[commandsIterator->first])
-			{
-				commandsIterator->second->Execute(deltaTime);
-			}
-		}
-
-		while (SDL_PollEvent(&e))
-		{
-			if (e.type == SDL_QUIT)
-			{
+			if (e.type == SDL_QUIT) {
 				return false;
 			}
-
-			if(e.type == SDL_KEYDOWN)
-			{
-				
+			if (e.type == SDL_KEYDOWN) {
+				for (const auto& controller : m_KeyCommands)
+				{
+					if (controller->state == KeyState::Down)
+					{
+						if (e.key.keysym.scancode == controller->key)
+							controller->command.get()->Execute(deltaT);
+					}
+				}
 			}
-
 			if (e.type == SDL_KEYUP)
 			{
-
+				for (const auto& controller : m_KeyCommands)
+				{
+					if (controller->state == KeyState::Up)
+					{
+						if (e.key.keysym.scancode == controller->key)
+							controller->command.get()->Execute(deltaT);
+					}
+				}
 			}
-
-			ImGui_ImplSDL2_ProcessEvent(&e);
+			if (e.type == SDL_MOUSEBUTTONDOWN && m_isMousePressed == false)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+					m_isMousePressed = true;
+			}
+			if (e.type == SDL_MOUSEBUTTONUP)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+					m_isMousePressed = false;
+			}
 		}
 
-		for (const auto& controller : m_pGamePads)
+		Update();
+
+		for (const auto& controller : m_KeyCommands)
 		{
-			controller->Update();
-
-			for (auto CommandsIterator = m_Commands.begin(); CommandsIterator != m_Commands.end(); ++CommandsIterator)
+			switch (controller->state)
 			{
-				if(CommandsIterator->first.first != controller->idx)
-				{
-					continue;
-				}
-
-				switch (CommandsIterator->second.second)
-				{
-				case InputType::pressed:
-					if (controller->IsBeingPressed(CommandsIterator->first.second))
-					{
-						CommandsIterator->second.first->Execute(deltaTime);
-					}
-					break;
-				case InputType::up:
-					if (controller->IsUp(CommandsIterator->first.second))
-					{
-						CommandsIterator->second.first->Execute(deltaTime);
-					}
-					break;
-				case InputType::down:
-					if (controller->IsDown(CommandsIterator->first.second))
-					{
-						CommandsIterator->second.first->Execute(deltaTime);
-					}
-					break;
-				default:
-					break;
-				}
-			}
-
-			if (controller->IsDown(ControllerButton::LeftShoulder))
-			{
-				return false;
+			case KeyState::Down:
+				if (IsDownThisFrame(controller->controllerButton, controller->playerIdx))
+					controller->command->Execute(deltaT);
+				break;
+			case KeyState::Pressed:
+				if (IsPressed(controller->controllerButton, controller->playerIdx))
+					controller->command->Execute(deltaT);
+				break;
+			case KeyState::Up:
+				if (IsUpThisFrame(controller->controllerButton, controller->playerIdx))
+					controller->command->Execute(deltaT);
+				break;
+			default:
+				break;
 			}
 		}
 
 		return true;
 	}
 
-	void InputManager::AssignButtonToCommand(unsigned int controllerIdx, ControllerButton button, std::unique_ptr<Command>&& command, InputType inputType)
+	void InputManager::Update()
 	{
-		m_Commands[std::make_pair(controllerIdx, button)] = std::make_pair(std::move(command), inputType);
+		for (const auto& controller : m_pControllers)
+		{
+			controller->Update();
+		}
 	}
 
-	void InputManager::AssignButtonToCommand(SDL_Scancode button, std::unique_ptr<Command>&& command)
+	// returns size of m_pControllers aka the last added player what
+	// their number is
+	int InputManager::AddPlayer()
 	{
-		m_KeyboardCommands[button] = std::move(command);
+		int idx = static_cast<int>(m_pControllers.size());
+		m_pControllers.push_back(std::make_unique<XBox360Controller>(idx));
+		return idx;
+	}
+
+	// returns a player, if the idx is out-of-range it takes the last added player
+	XBox360Controller& InputManager::GetPlayer(int idx)
+	{
+		if (idx <= m_pControllers.size())
+		{
+			return *m_pControllers.at(idx);
+		}
+		else
+		{
+			return *m_pControllers.back();
+		}
+
+	}
+
+
+	bool InputManager::IsPressed(XBox360Controller::Button button, int  playerIdx) const
+	{
+		return m_pControllers[playerIdx]->IsBeingPressed(button);
+	}
+
+	bool InputManager::IsDownThisFrame(XBox360Controller::Button button, int playerIdx) const
+	{
+		return m_pControllers[playerIdx]->IsDown(button);
+	}
+
+	bool InputManager::IsUpThisFrame(XBox360Controller::Button button, int playerIdx) const
+	{
+		return m_pControllers[playerIdx]->IsUp(button);
+	}
+
+	void InputManager::AddCommand(XBox360Controller::Button controllerButton, SDL_Scancode keyboardButton, std::shared_ptr<Command> command, int playerIdx, KeyState state)
+	{
+		if (playerIdx > m_pControllers.size())
+		{
+			std::cout << "Player not found, cannot add command\n" << std::endl;
+			return;
+		}
+		KeyAction* action = new KeyAction();
+		action->command = command;
+		action->controllerButton = controllerButton;
+		action->state = state;
+		action->playerIdx = playerIdx;
+		action->key = keyboardButton;
+		m_KeyCommands.emplace_back(action);
 	}
 	
 }

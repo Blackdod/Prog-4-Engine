@@ -1,39 +1,69 @@
 #pragma once
 #include <memory>
 #include <map>
+#include <SDL_scancode.h>
+
 #include "Controllers.h"
 #include "Singleton.h"
 #include "Command.h"
 
 namespace dae
 {
-	enum class InputType
-	{
-		down,
-		up,
-		pressed
-	};
+	
 
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
-		InputManager();
-		~InputManager() = default;
-		bool ProcessInput(float deltaTime);
+		enum class MouseButton
+		{
+			Left, Middle, Right
+		};
 
-		void AssignButtonToCommand(	unsigned int controllerIdx,
-									ControllerButton button,
-									std::unique_ptr<Command>&& command,
-									InputType inputType);
+		enum class KeyState
+		{
+			Down,
+			Pressed,
+			Up
+		};
 
-		void AssignButtonToCommand(SDL_Scancode button,
-									std::unique_ptr<Command>&& command);
+		struct KeyAction
+		{
+			KeyState state{};
+			std::shared_ptr<Command> command{};
+			int playerIdx{};
+
+			XBox360Controller::Button controllerButton{};
+			SDL_Scancode key{};
+		};
+
+		InputManager() = default;
+		~InputManager();
+		bool ProcessInput(float deltaT);
+		void Update();
+
+		int AddPlayer();
+
+
+		bool IsPressed(XBox360Controller::Button button, int playerIdx) const;
+		bool IsDownThisFrame(XBox360Controller::Button button, int playeIdx) const;
+		bool IsUpThisFrame(XBox360Controller::Button button, int playerIdx) const;
+		glm::ivec2 GetMousePos()const { return m_MousePos; };
+		bool IsMousePressed() const { return m_isMousePressed; };
+
+		void AddCommand(XBox360Controller::Button button, SDL_Scancode keyboardButton, std::shared_ptr<Command> command, int playerIdx, KeyState state = KeyState::Down);
+
+		XBox360Controller& GetPlayer(int idx);
 
 	private:
-		std::vector<std::unique_ptr<XBox360Controller>> m_pGamePads{};
 
-		std::map<std::pair<unsigned, ControllerButton>, std::pair<std::unique_ptr<Command>, InputType>> m_Commands;
-		std::map< SDL_Scancode, std::unique_ptr<Command>> m_KeyboardCommands;
+		const Uint8* m_pCurrentState{};
+		Uint8* m_pPreviousState{};
+
+		std::vector<std::unique_ptr<XBox360Controller>> m_pControllers{};
+		std::vector<KeyAction*> m_KeyCommands{};
+
+		glm::ivec2 m_MousePos{};
+		bool m_isMousePressed{ false };
 	};
 
 }

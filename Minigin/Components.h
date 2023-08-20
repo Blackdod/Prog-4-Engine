@@ -35,6 +35,7 @@ namespace dae
 		virtual void SetPosition([[maybe_unused]] glm::vec3 pos) {};
 
 		const GameObject* GetOwner() const { return m_pOwner; };
+		GameObject* GetChangeableOwner() const { return m_pOwner; };
 	protected:
 		explicit Component(GameObject* pOwner) : m_pOwner(pOwner) {};
 	private:

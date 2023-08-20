@@ -57,8 +57,8 @@ void PlayerComponent::Update(float dt)
 		break;
 	}
 
-	auto collisions = dae::CollisionManager::GetInstance().GetColliders();
-	auto myCollider = this->GetOwner()->GetComponent<dae::ColliderComponent>();
+	const auto& collisions = dae::CollisionManager::GetInstance().GetColliders();
+	const auto myCollider = this->GetOwner()->GetComponent<dae::ColliderComponent>();
 
 	myCollider->SetPosition(targetPos.x, targetPos.y);
 
@@ -148,13 +148,13 @@ bool PlayerComponent::CollidesInTargetDir(float dt)
 		break;
 	}
 
-	auto collisions = dae::CollisionManager::GetInstance().GetColliders();
-	auto myCollider = this->GetOwner()->GetComponent<dae::ColliderComponent>();
+	const auto& collisions = dae::CollisionManager::GetInstance().GetColliders();
+	const auto myCollider = this->GetOwner()->GetComponent<dae::ColliderComponent>();
 
 	// set the collider position to the future movement to test collision
 	myCollider->SetPosition(targetPos.x, targetPos.y);
 
-	for (auto collision : collisions)
+	for (const auto collision : collisions)
 	{
 		//skipping same collision
 		if (collision == myCollider)
