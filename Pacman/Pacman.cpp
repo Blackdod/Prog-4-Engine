@@ -18,6 +18,7 @@
 #include "GameObject.h"
 #include "InputManager.h"
 #include "GameCommands.h"
+#include "LevelCreator.h"
 
 void load()
 {
@@ -93,6 +94,8 @@ void load()
 	InputManager::GetInstance().AddCommand(XBox360Controller::Button::ButtonA, SDL_SCANCODE_E, dieCommand, 0, InputManager::KeyState::Down);
 
 	scene.Add(pacman_go);
+
+	LevelCreator::GetInstance().CreateLevel(L"../Data/level1.json", &scene);
 }
 
 int main(int, char* []) {
